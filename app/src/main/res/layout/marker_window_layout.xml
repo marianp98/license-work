@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/linear"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#808080"
+    android:padding="15dp"
+    android:enabled="true"
+    android:textIsSelectable="true"
+    android:focusable="true"
+    android:longClickable="true">
+
+    <LinearLayout
+        android:id="@+id/linear1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+
+        android:enabled="true"
+        android:textIsSelectable="true"
+        android:focusable="true"
+        android:longClickable="true">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:enabled="true"
+            android:textIsSelectable="true"
+            android:focusable="true"
+            android:longClickable="true"/>
+
+        <TextView
+            android:id="@+id/user_id_claim"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="invisible"
+/>
+
+
+        <TextView
+            android:id="@+id/snippet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="10"
+            android:textColor="#000"
+            android:textIsSelectable="true"
+            android:textSize="14sp"
+            android:enabled="true"
+            android:focusable="true"
+            android:longClickable="true"/>
+
+<!--        <RelativeLayout-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_width="fill_parent"-->
+<!--            android:orientation="horizontal"-->
+<!--            android:id="@+id/claim_and_message"-->
+<!--            >-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/chat"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_alignParentStart="true"-->
+<!--                android:layout_alignParentLeft="true"-->
+<!--                android:layout_centerVertical="true"-->
+<!--                android:text="Chat"-->
+
+<!--                android:textColor="#000000"-->
+<!--                android:textSize="24sp" />-->
+
+<!--            <ImageButton-->
+<!--                android:id="@+id/imageButton"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:src="@drawable/ic_messenger9"-->
+<!--                android:layout_alignParentLeft="true"-->
+<!--                android:paddingTop="8dp"-->
+<!--                android:background="@android:color/transparent"-->
+<!--                android:layout_centerVertical="true"-->
+
+<!--                />-->
+
+            <Button
+                android:id="@+id/button_claim"
+                android:layout_gravity="right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:background="@color/green"
+                android:text="Claim" />
+
+
+
+
+<!--        </RelativeLayout>-->
+
+    </LinearLayout>
+
+</RelativeLayout>

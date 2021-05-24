@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.LoggedUserActivity">
+
+    <Button
+        android:id="@+id/mark_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/find_parking_spot"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/view_info_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="127dp"
+        android:layout_marginLeft="127dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="128dp"
+        android:layout_marginRight="128dp"
+        android:text="@string/show_userinfo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/show_parkings_button" />
+
+    <Button
+        android:id="@+id/logged_user_logout_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="160dp"
+        android:layout_marginLeft="160dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="160dp"
+        android:layout_marginRight="160dp"
+        android:background="#FFFFFF"
+        android:text="@string/logout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_info_button" />
+
+    <Button
+        android:id="@+id/show_parkings_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="160dp"
+        android:layout_marginLeft="160dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="160dp"
+        android:layout_marginRight="160dp"
+        android:text="@string/parking_spots"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mark_button" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!--    <?xml version="1.0" encoding="utf-8"?>-->
+    <!--<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+    <!--xmlns:tools="http://schemas.android.com/tools"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--tools:context=".LoggedUserActivity">-->
+
+    <!--<Button-->
+    <!--    android:id="@+id/mark_button"-->
+    <!--    android:layout_width="wrap_content"-->
+    <!--    android:layout_height="wrap_content"-->
+    <!--    android:layout_marginTop="10dp"-->
+    <!--    android:text="@string/find_parking_spot"-->
+    <!--    app:layout_constraintEnd_toEndOf="parent"-->
+    <!--    app:layout_constraintStart_toStartOf="parent"-->
+    <!--    app:layout_constraintTop_toTopOf="parent" />-->
+
+    <!--<Button-->
+    <!--    android:id="@+id/logged_user_coordinates_button"-->
+    <!--    android:layout_width="wrap_content"-->
+    <!--    android:layout_height="wrap_content"-->
+    <!--    android:layout_marginStart="160dp"-->
+    <!--    android:layout_marginLeft="160dp"-->
+    <!--    android:layout_marginTop="20dp"-->
+    <!--    android:layout_marginEnd="159dp"-->
+    <!--    android:layout_marginRight="159dp"-->
+    <!--    android:text="@string/add_parking_spot"-->
+    <!--    app:layout_constraintEnd_toEndOf="parent"-->
+    <!--    app:layout_constraintStart_toStartOf="parent"-->
+    <!--    app:layout_constraintTop_toBottomOf="@+id/mark_button" />-->
+
+    <!--<Button-->
+    <!--    android:id="@+id/logged_user_share_parking_button"-->
+    <!--    android:layout_width="wrap_content"-->
+    <!--    android:layout_height="wrap_content"-->
+    <!--    android:layout_marginStart="160dp"-->
+    <!--    android:layout_marginLeft="160dp"-->
+    <!--    android:layout_marginTop="20dp"-->
+    <!--    android:layout_marginEnd="160dp"-->
+    <!--    android:layout_marginRight="160dp"-->
+    <!--    android:text="@string/share_parking_spot"-->
+    <!--    app:layout_constraintEnd_toEndOf="parent"-->
+    <!--    app:layout_constraintHorizontal_bias="0.502"-->
+    <!--    app:layout_constraintStart_toStartOf="parent"-->
+    <!--    app:layout_constraintTop_toBottomOf="@+id/logged_user_coordinates_button" />-->
+
+    <!--<Button-->
+    <!--    android:id="@+id/logged_user_logout_button"-->
+    <!--    android:layout_width="wrap_content"-->
+    <!--    android:layout_height="wrap_content"-->
+    <!--    android:layout_marginStart="160dp"-->
+    <!--    android:layout_marginLeft="160dp"-->
+    <!--    android:layout_marginTop="20dp"-->
+    <!--    android:layout_marginEnd="160dp"-->
+    <!--    android:layout_marginRight="160dp"-->
+    <!--    android:text="@string/logout"-->
+    <!--    app:layout_constraintEnd_toEndOf="parent"-->
+    <!--    app:layout_constraintStart_toStartOf="parent"-->
+    <!--    app:layout_constraintTop_toBottomOf="@+id/show_parkings_button" />-->
+
+    <!--<Button-->
+    <!--    android:id="@+id/show_parkings_button"-->
+    <!--    android:layout_width="wrap_content"-->
+    <!--    android:layout_height="wrap_content"-->
+    <!--    android:layout_marginStart="160dp"-->
+    <!--    android:layout_marginLeft="160dp"-->
+    <!--    android:layout_marginTop="20dp"-->
+    <!--    android:layout_marginEnd="160dp"-->
+    <!--    android:layout_marginRight="160dp"-->
+    <!--    android:text="@string/show_parkings"-->
+    <!--    app:layout_constraintEnd_toEndOf="parent"-->
+    <!--    app:layout_constraintStart_toStartOf="parent"-->
+    <!--    app:layout_constraintTop_toBottomOf="@+id/view_info_button" />-->
+
+    <!--<Button-->
+    <!--    android:id="@+id/view_info_button"-->
+    <!--    android:layout_width="wrap_content"-->
+    <!--    android:layout_height="wrap_content"-->
+    <!--    android:layout_marginStart="160dp"-->
+    <!--    android:layout_marginLeft="160dp"-->
+    <!--    android:layout_marginTop="20dp"-->
+    <!--    android:layout_marginEnd="160dp"-->
+    <!--    android:layout_marginRight="160dp"-->
+    <!--    android:text="@string/show_userinfo"-->
+    <!--    app:layout_constraintEnd_toEndOf="parent"-->
+    <!--    app:layout_constraintStart_toStartOf="parent"-->
+    <!--    app:layout_constraintTop_toBottomOf="@+id/logged_user_share_parking_button" />-->
+    <!--</androidx.constraintlayout.widget.ConstraintLayout>-->

@@ -1,0 +1,75 @@
+<resources>
+    <string name="google_maps_API_key">AIzaSyC4DltEDNqstZvEX3UFM_RcSFCJb3qiMes</string>
+    <string name="welcome">Welcome to the ParkingApp!</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="welcome_message_login">Welcome to the Parking App</string>
+    <string name="action_sign_in">Login</string>
+    <string name="prompt_password">Password</string>
+    <string name="prompt_email">Email</string>
+    <string name="app_name">Parking Spot Sharing System</string>
+
+
+    <!-- Strings related to login -->
+    <string name="hint_username">Username</string>
+    <string name="hint_phone_number">Phone number</string>
+    <string name="hint_name">Name</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_repeat_password">Re-type Password</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="hint_new_email">New Email</string>
+
+
+    <!-- Strings related to Parking info -->
+    <string name="action_save">Save</string>
+    <string name="action_autofill">Autofill</string>
+    <string name="hint_town">Town</string>
+    <string name="hint_address">Address</string>
+    <string name="hint_ZipCode">ZipCode</string>
+    <string name="hint_latitude">Latitude</string>
+    <string name="hint_longitude">Longitude</string>
+    <string name="title_activity_maps2">Map</string>
+
+    <string name="mark_available">Mark as available</string>
+
+    <string name="Save">Save</string>
+    <string name="insert_parking_nr"> Insert Parking Number</string>
+    <string name="country">Country</string>
+    <string name="city">City</string>
+
+    <!-- Strings related to Parking info -->
+    <string name="hint_date_start">Starting date</string>
+    <string name="hint_date_end">Ending date</string>
+    <string name="hint_time_start">Starting time</string>
+    <string name="hint_time_end">Ending time</string>
+    <string name="hint_starting_from">Starting time</string>
+    <string name="hint_start_until">Ending time</string>
+
+    <string name="add_parking_spot">Attach Your ParkingSpot</string>
+    <string name="share_parking_spot">Share Your ParkingSpot</string>
+    <string name="find_parking_spot">Find a ParkingSpot</string>
+    <string name="logout">Logout</string>
+
+    <string name="edit_parkinginfo">View Parking Info</string>
+    <string name="edit_userinfo">Edit Your Info</string>
+    <string name="show_userinfo">View Your Info</string>
+    <string name="delete_parking">Delete Parking</string>
+    <string name="show_parkings">View your Parkings</string>
+    <string name="parking_spots">ParkingSpot</string>
+
+
+    <string name="user_name">Name</string>
+    <string name="user_username">Username</string>
+    <string name="user_email">Email</string>
+    <string name="user_phone">Phone Number</string>
+    <string name="user_phone_update">Change Phone Number</string>
+    <string name="user_email_update">Change Email</string>
+    <string name="user_delete">Delete Account</string>
+
+
+    <string name="parking_town">Town</string>
+    <string name="parking_address">Address</string>
+    <string name="parking_number">Parking Number</string>
+
+
+</resources>
