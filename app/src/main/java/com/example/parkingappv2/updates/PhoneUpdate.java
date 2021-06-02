@@ -1,6 +1,7 @@
 package com.example.parkingappv2.updates;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
@@ -45,6 +46,10 @@ public class PhoneUpdate extends ShowUserActivity {
     }
 
     private void update_phone() {
+
+        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        String token=preferences_token.getString("token", null);
+
         updated=findViewById(R.id.editTextPhone);
         String phone=updated.getText().toString();
 

@@ -3,6 +3,7 @@ package com.example.parkingappv2.activities;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -71,6 +72,9 @@ public class SetAvailabilityActivity extends AppCompatActivity {
     }
 
     private void SaveAvailability() {
+        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        String token=preferences_token.getString("token", null);
+
         TextView textview_startTime = (TextView) findViewById(R.id.start_date);
         String startTime = textview_startTime.getText().toString();
 

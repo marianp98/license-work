@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Criteria;
@@ -121,6 +122,8 @@ public class ShowParkingActivity extends AppCompatActivity implements LocationLi
     }
 
     private void show_parking() {
+        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        String token=preferences_token.getString("token", null);
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
@@ -138,7 +141,7 @@ public class ShowParkingActivity extends AppCompatActivity implements LocationLi
                     mParkingSpots.clear();
                     mParkingSpots.addAll(response.body());
                     Log.e(TAG, "onResponse: got parking slots of total: " + response.body().size());
-                    Log.e(TAG, "onResponse v1: "+response.body().get(0).isClaimed());
+//                    Log.e(TAG, "onResponse v1: "+response.body().get(0).isClaimed());
 
                     //before building the recycler view, you have to check
                     //if the Parking is available or not
@@ -229,12 +232,17 @@ public class ShowParkingActivity extends AppCompatActivity implements LocationLi
     }//end get
 
     private void getAvailabilitySlots1() {
+        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        String token=preferences_token.getString("token", null);
+
+        SharedPreferences preferences_user_id = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        String user_id=preferences_user_id.getString("user_id", null);
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
         Call<List<Availability>> call = getRetrofit(gson).getAvailableSlots1(
                 Constants.bearerToken,
-                Constants.user_id
+                user_id
         );
         //execute
         call.enqueue(new Callback<List<Availability>>() {
@@ -245,7 +253,7 @@ public class ShowParkingActivity extends AppCompatActivity implements LocationLi
 
                     //pass the time slots to check the availability
                     final List<ParkingSpot> parkingSpots = isParkingAvailable(response.body());
-                    Log.d(TAG, "onResponse v2: "+response.body().get(0).getClaimed());
+                   // Log.d(TAG, "onResponse v2: "+response.body().get(0).getClaimed());
 
                     //update UI (setup recycler view)
                     buildRecyclerView(parkingSpots);
@@ -290,12 +298,12 @@ public class ShowParkingActivity extends AppCompatActivity implements LocationLi
                                     currentSpot.getAddress(),
                                     currentSpot.getParkingNumber(),
                                     isSpotAvailable,
-                                    currentSpot.isClaimed()
+                                    currentSpot.getClaimed()
 
                             ));
-                    if(currentSpot.isClaimed())
-                    Log.e(TAG, "isParkingAvailable1: "+"ISCLAIMED = 1");
-                    if(!currentSpot.isClaimed() )
+                    if(currentSpot.getClaimed()==1)
+                        Log.e(TAG, "isParkingAvailable1: "+"ISCLAIMED = 1");
+                    if(currentSpot.getClaimed() ==0)
                         Log.e(TAG, "isParkingAvailable1: "+"ISCLAIMED = 0");
                     Log.e(TAG, "isParkingAvailable1: "+"TESTTTTTTTTT = 0");
 
@@ -310,9 +318,9 @@ public class ShowParkingActivity extends AppCompatActivity implements LocationLi
                                 currentSpot.getAddress(),
                                 currentSpot.getParkingNumber(),
                                 true,
-                                currentSpot.isClaimed()
+                                currentSpot.getClaimed()
                         ));
-                if(currentSpot.isClaimed())
+                if(currentSpot.getClaimed() ==1)
                     Log.e(TAG, "isParkingAvailable2: "+"ISCLAIMED = 1");
             }
 

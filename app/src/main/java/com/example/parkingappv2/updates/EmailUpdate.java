@@ -3,6 +3,7 @@ package com.example.parkingappv2.updates;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
@@ -45,6 +46,9 @@ public class EmailUpdate extends AppCompatActivity {
     }
 
     private void update_email() {
+        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        String token=preferences_token.getString("token", null);
+
         updated=findViewById(R.id.changeTextEmail);
         String email=updated.getText().toString();
 

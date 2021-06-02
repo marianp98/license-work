@@ -12,6 +12,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -19,6 +21,8 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.provider.CalendarContract;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -80,6 +84,11 @@ public class LoginActivity extends FragmentActivity implements OnMapReadyCallbac
     private EditText email;
     private Button login_button;
     private CheckBox remember;
+    public static final String SHARED_PREFS="sharedPrefs";
+    public static final String TEXT="text";
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +101,7 @@ public class LoginActivity extends FragmentActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment)
                 getSupportFragmentManager()
                         .findFragmentById(R.id.first_map);
+        assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
         email = findViewById(R.id.loginpage_email);
@@ -138,9 +148,23 @@ public class LoginActivity extends FragmentActivity implements OnMapReadyCallbac
                 }
             }
         });
-
-
     }
+    public void saveData(String name, String token, String user_id)
+    {
+        SharedPreferences sharedPreferences=getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor= sharedPreferences.edit();
+        editor.putString("name", name);
+        editor.putString("token", token);
+        editor.putString("user_id", user_id);
+
+        Log.e(TAG, "saveData: name: "+name );
+        Log.e(TAG, "saveData: token: "+token );
+        Log.e(TAG, "saveData: user_id: "+user_id );
+
+        editor.apply();
+    }
+
+
     public void statusCheck() {
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -205,6 +229,8 @@ public class LoginActivity extends FragmentActivity implements OnMapReadyCallbac
                     Log.println(Log.DEBUG, TAG, userResponse.body().getToken() + "TEST");
                     Constants.bearerToken="Bearer "+ userResponse.body().getToken();
                     Constants.user_id=userResponse.body().getId();
+                    Log.e(TAG, "onResponse: "+ userResponse.body().getName().toString());
+                    saveData(userResponse.body().getName(),userResponse.body().getToken(), userResponse.body().getId());
                     login_success();
                 }
             }
@@ -233,7 +259,23 @@ public class LoginActivity extends FragmentActivity implements OnMapReadyCallbac
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             String usernameInput = email.getText().toString().trim();
             String passwordInput = password.getText().toString().trim();
-            login_button.setEnabled(!usernameInput.isEmpty() && !passwordInput.isEmpty());
+            boolean email_empty=usernameInput.isEmpty();
+            boolean password_empty=passwordInput.isEmpty();
+            if(!usernameInput.isEmpty() && !passwordInput.isEmpty() )
+            {
+                login_button.setEnabled(true);
+                login_button.setBackgroundResource(R.drawable.signup_button_shape);
+
+            }
+            else
+            {
+                login_button.setEnabled(false);
+                login_button.setBackgroundResource(R.drawable.login_button_shape);
+
+            }
+
+
+
         }
         @Override
         public void afterTextChanged(Editable s) {

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/ic_sprk_default_preset_name_google_pixel_4_4xl___1"
     tools:context=".activities.LoginActivity">
 
     <EditText
@@ -15,15 +16,16 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="32dp"
         android:layout_marginRight="32dp"
+        android:layout_weight="12.5"
         android:ems="10"
         android:hint="Email:"
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.562"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginpage_login"
-        android:layout_weight="12.5"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/loginpage_welcome" />
+
+    <!--        app:layout_constraintTop_toBottomOf="@+id/loginpage_login" />-->
 
     <EditText
         android:id="@+id/loginpage_password"
@@ -34,15 +36,14 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="32dp"
         android:layout_marginRight="32dp"
+        android:layout_weight="12.5"
         android:ems="10"
         android:hint="Password:"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.562"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginpage_email"
-        android:layout_weight="12.5"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/loginpage_email" />
 
     <TextView
         android:id="@+id/loginpage_welcome"
@@ -52,35 +53,33 @@
         android:layout_marginLeft="24dp"
         android:layout_marginEnd="24dp"
         android:layout_marginRight="24dp"
+        android:layout_weight="12.5"
         android:text="Welcome to the Parking App"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_weight="12.5"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/loginpage_login"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginLeft="32dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginRight="32dp"
-        android:text="Login"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginpage_welcome"
-        android:layout_weight="12.5"
-        />
+<!--    <TextView-->
+<!--        android:id="@+id/loginpage_login"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginStart="32dp"-->
+<!--        android:layout_marginLeft="32dp"-->
+<!--        android:layout_marginTop="4dp"-->
+<!--        android:layout_marginEnd="32dp"-->
+<!--        android:layout_marginRight="32dp"-->
+<!--        android:layout_weight="12.5"-->
+<!--        android:text="Login"-->
+<!--        android:textSize="18sp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/loginpage_welcome" />-->
 
     <Button
         android:id="@+id/loginpage_loginbutton"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginStart="32dp"
         android:layout_marginLeft="32dp"
         android:layout_marginTop="28dp"
@@ -89,22 +88,23 @@
         android:layout_weight="12.5"
         android:enabled="false"
         android:text="Login"
-        app:backgroundTint="#009900"
+        android:background="@drawable/login_button_shape"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/loginpage_password" />
 
     <Button
         android:id="@+id/loginpage_signupbutton"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="40dp"
         android:layout_marginRight="40dp"
         android:layout_weight="12.5"
+        android:background="@drawable/signup_button_shape"
         android:text="SIGN UP"
-        app:backgroundTint="#009900"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
@@ -126,12 +126,12 @@
         android:id="@+id/first_map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="fill_parent"
+        android:layout_height="450dp"
         android:layout_marginTop="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginpage_signupbutton"
-        android:layout_height="450dp" />
+        app:layout_constraintTop_toBottomOf="@+id/loginpage_signupbutton" />
 
     <CheckBox
         android:id="@+id/checkBox_login"

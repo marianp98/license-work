@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -18,11 +19,15 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.Layout;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.app.ActivityCompat;
@@ -40,16 +45,17 @@ import com.example.parkingappv2.Constants;
 import com.example.parkingappv2.MyApi;
 import com.example.parkingappv2.R;
 import com.example.parkingappv2.adapters.CustomInfoWindowAdapter;
-import com.example.parkingappv2.adapters.CustomInfoWindowAdapter_claimed;
 import com.example.parkingappv2.adapters.OnInfoWindowElemTouchListener;
 import com.example.parkingappv2.models.Availability;
 import com.example.parkingappv2.models.ParkingSpot;
 import com.example.parkingappv2.updates.PhoneUpdate;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -59,6 +65,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -68,8 +79,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -118,7 +132,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public String url;
     LocationRequest mLocationRequest;
     private GoogleMap mMap;
-    private View v;
+    EditText editTextLocationSearch;
+    TextView textView1LocationSearch, textView2LocationSearch;
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -133,11 +149,129 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment)
                 getSupportFragmentManager()
                         .findFragmentById(R.id.map2);
-
         mapFragment.getMapAsync(this);
-        v = getLayoutInflater().inflate(R.layout.marker_window_layout, null);
+
+
+        editTextLocationSearch = findViewById(R.id.input_search);
+        textView1LocationSearch = findViewById(R.id.text_view1);
+        textView2LocationSearch = findViewById(R.id.text_view2);
+
+        //Initialize places
+        Places.initialize(getApplicationContext(), "AIzaSyAYsTqQHbhYrPoAcrVEua3NPszZaKbHVyk");
+
+        //Set EditText non focusable
+        editTextLocationSearch.setFocusable(false);
+
+        editTextLocationSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Initialize place field list
+                List<Place.Field> fiedlList = Arrays.asList(Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.NAME);
+
+                //Create Intent
+                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY,
+                        fiedlList).build(MapsActivity.this);
+
+                //Start resulted activity
+                startActivityForResult(intent, 100);
+
+            }
+        });
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 100 && resultCode == RESULT_OK) {
+            //When success -> initialize place
+            Place place = Autocomplete.getPlaceFromIntent(data);
+
+            //Set Address on EditText
+            editTextLocationSearch.setText(place.getAddress());
+
+            //Set locality name
+            textView1LocationSearch.setText(String.format("Locality Name : %s", place.getName()));
+
+            //Set latitude& longitude
+            textView2LocationSearch.setText(String.valueOf(place.getLatLng()));
+
+            Log.e(TAG, "onActivityResult: " + place.getAddress()+place.getName() + place.getLatLng() );
+
+//            LatLng coordinate =  place.getLatLng();
+//            CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
+//                    coordinate, 15);
+//            mMap.animateCamera(location);
+
+
+
+
+            LatLng coordinate =  place.getLatLng();             MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(coordinate);
+            markerOptions.title(place.getAddress()); //Here Total Address is address which you want to show on marker
+           // mMap.clear();
+
+
+            markerOptions.icon(
+                    BitmapDescriptorFactory
+                            .defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+
+            markerOptions.getPosition();
+            mCurrLocationMarker = mMap.addMarker(markerOptions);
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(coordinate));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
+
+
+        } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
+            //When error -> Initialize status
+            Status status = Autocomplete.getStatusFromIntent(data);
+
+            //Display toast message
+            Toast.makeText(getApplicationContext(), status.getStatusMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    private void init() {
+        Log.d(TAG, "init: initializing");
+
+        editTextLocationSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH
+                        || actionId == EditorInfo.IME_ACTION_DONE
+                        || event.getAction() == KeyEvent.ACTION_DOWN
+                        || event.getAction() == KeyEvent.KEYCODE_ENTER) {
+                    geolocate();
+                }
+
+                return false;
+            }
+        });
+    }
+
+    private void geolocate()
+    {
+        String searchString=editTextLocationSearch.getText().toString();
+        Geocoder geocoder= new Geocoder((MapsActivity.this));
+        List<Address> list= new ArrayList<>();
+        try {
+            list=geocoder.getFromLocationName(searchString,1);
+        }
+        catch (IOException e)
+        {
+            Log.e(TAG, "geolocate: IOException: "+ e.getMessage() );
+        }
+        if(list.size() >0)
+        {
+            Address address=list.get(0);
+            Log.e(TAG, "geolocate: " + address.toString() );
+        }
+
 
     }
+
+
 
     public void statusCheck() {
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -173,6 +307,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
+        mMap.setPadding(0, 150, 0, 0);
+
         //Initialize Google Play Services
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(this,
@@ -185,7 +321,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
+
         getData();
+      //  init();
+
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -341,9 +480,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.moveCamera(CameraUpdateFactory.newLatLng(marker));
         } else {
             if (Integer.parseInt(claimed) == 1) {
-              //**************************************************************************************  boolean isSpotClaimed = compareTimes(currentTime, stopTime);
+                //**************************************************************************************  boolean isSpotClaimed = compareTimes(currentTime, stopTime);
 
-                mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter_claimed(MapsActivity.this));
+                mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this));
 
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                 mark = mMap.addMarker(markerOptions.position(marker).title("Parking Owner: " + db_name)
@@ -472,6 +611,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void delete_availability(Marker marker, MarkerOptions markerOptions) {
+        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        String token=preferences_token.getString("token", null);
+
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
@@ -636,7 +778,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void claim_spot(String id) {
-
+        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        String token=preferences_token.getString("token", null);
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
@@ -645,50 +788,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .baseUrl(Constants.BaseUrl)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
+
         MyApi api = retrofit.create(MyApi.class);
         Call<ParkingSpot> call = api.claimSpot(
                 Constants.bearerToken,
                 id,
-                "1"
+                1
         );
         call.enqueue(new Callback<ParkingSpot>() {
             @Override
             public void onResponse(Call<ParkingSpot> call, retrofit2.Response<ParkingSpot> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Log.e(TAG, "onResponse: ");
-                }
-            }
+                    Toast.makeText(MapsActivity.this, "The ParkingSpot was claimed successfully!", Toast.LENGTH_SHORT).show();
 
-            @Override
-            public void onFailure(Call<ParkingSpot> call, Throwable t) {
-                Toast.makeText(MapsActivity.this, Constants.error_availability, Toast.LENGTH_SHORT).show();
-                Log.e("RETROFIT", "onFailure: " + t.getLocalizedMessage());
-            }
-        });
-    }
-
-
-    private void unclaim_spot(String id) {
-
-        Gson gson = new GsonBuilder()
-                .setLenient()
-                .create();
-        //build retrofit request
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Constants.BaseUrl)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-        MyApi api = retrofit.create(MyApi.class);
-        Call<ParkingSpot> call = api.claimSpot(
-                Constants.bearerToken,
-                id,
-                "0"
-        );
-        call.enqueue(new Callback<ParkingSpot>() {
-            @Override
-            public void onResponse(Call<ParkingSpot> call, retrofit2.Response<ParkingSpot> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Log.e(TAG, "onResponse: ");
                 }
             }
 

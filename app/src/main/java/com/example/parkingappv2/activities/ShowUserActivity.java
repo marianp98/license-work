@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -98,6 +99,9 @@ public class ShowUserActivity extends AppCompatActivity {
     }
 
     private void delete_user() {
+        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        String token=preferences_token.getString("token", null);
+
         //build retrofit request
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.BaseUrl)
@@ -125,6 +129,8 @@ public class ShowUserActivity extends AppCompatActivity {
 
 
     private void show_user() {
+        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        String token=preferences_token.getString("token", null);
 
         name_tv = (TextView) findViewById(R.id.user_name);
         username_tv = (TextView) findViewById(R.id.user_username);

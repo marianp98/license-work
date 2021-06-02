@@ -3,7 +3,7 @@ package com.example.parkingappv2.models;
 public class ParkingSpot {
     private String id, user_id, town, address, parkingNumber, latitude, longitude;
     private boolean isAvailable;
-    private boolean isClaimed;
+    private int claimed;
 
 
 
@@ -17,12 +17,12 @@ public class ParkingSpot {
         this.longitude = longitude;
     }
 
-    public ParkingSpot(String id, String address, String parkingNumber , boolean isAvailable, boolean isClaimed) {
+    public ParkingSpot(String id, String address, String parkingNumber , boolean isAvailable, int claimed) {
         this.id = id;
         this.address = address;
         this.parkingNumber = parkingNumber;
         this.isAvailable = isAvailable;
-        this.isClaimed = isClaimed;
+        this.claimed = claimed;
 
     }
 
@@ -34,15 +34,14 @@ public class ParkingSpot {
         isAvailable = available;
     }
 
-    public boolean isClaimed() {
-        return isClaimed; }
 
-    public void setClaimed(boolean claimed) {
-        isClaimed = claimed;
+    public int getClaimed() {
+        return claimed;
     }
 
-
-
+    public void setClaimed(int claimed) {
+        this.claimed = claimed;
+    }
 
     public String getId() {
         return id;

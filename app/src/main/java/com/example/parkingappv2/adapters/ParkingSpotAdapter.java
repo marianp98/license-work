@@ -1,7 +1,9 @@
 package com.example.parkingappv2.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,7 +43,9 @@ public class ParkingSpotAdapter extends RecyclerView.Adapter<ParkingSpotAdapter.
 
     public interface OnItemClickListener {
         void onItemClick(int position);
+
         void finish();
+
         void refreshActivity();
     }
 
@@ -100,44 +104,56 @@ public class ParkingSpotAdapter extends RecyclerView.Adapter<ParkingSpotAdapter.
         return new ParkingSpotViewHolder(v, mListener);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(ParkingSpotViewHolder holder, int position) {
         ParkingSpot parkingspot = mParkingSpotList.get(position);
 
         holder.mTextView1.setText(parkingspot.getAddress());
-        holder.mTextView2.setText(parkingspot.getParkingNumber());
+        holder.mTextView2.setText("Parking number "+parkingspot.getParkingNumber());
         holder.mTextViewID.setText(parkingspot.getId());
         holder.position = position;
         holder.parkingspot = parkingspot;
 
-        if (parkingspot.isAvailable()) {
-            holder.available_button.setText("Mark Available");
-            holder.available_button.setTextColor(Color.WHITE);
-            holder.available_button.setBackgroundColor(Color.GREEN);
-        }
 
-        else {
-            if (parkingspot.isClaimed()) {
-                holder.available_button.setText("Markfewjqneif");
-                holder.available_button.setTextColor(Color.WHITE);
-                holder.available_button.setBackgroundColor(Color.GREEN);
-            }
-            holder.available_button.setText("Not Available");
+        if (parkingspot.getClaimed() == 1) {
+
+            holder.available_button.setText("Claimed");
             holder.available_button.setTextColor(Color.BLACK);
-            holder.available_button.setBackgroundColor(Color.GRAY);
-            holder.available_button.setEnabled(false);
-
-            //holder.delete_parking_button.setEnabled(false);
+            holder.available_button.setBackgroundColor(Color.DKGRAY);
+            //holder.available_button.setEnabled(false);
+        } else {
+            if (parkingspot.isAvailable()) {
+                holder.available_button.setText("Mark Available");
+                holder.available_button.setTextColor(Color.WHITE);
+                // holder.available_button.setBackgroundColor(Color.Gre);
+            } else {
+                holder.available_button.setText("Available");
+                holder.available_button.setTextColor(Color.BLACK);
+                holder.available_button.setBackgroundColor(Color.GRAY);
+                //holder.available_button.setEnabled(false);
+            }
         }
+
 
         holder.available_button.setOnClickListener(v -> {
-            if (parkingspot.isAvailable()) {
 
-                setAvailabilityAction(parkingspot.getId());
-            } else {
-                Toast.makeText(context, "Parking spot is already marked as available!"
+            if(parkingspot.getClaimed()==1)
+            {
+                Toast.makeText(context, "Parking spot was claimed by another user"
                         , Toast.LENGTH_SHORT).show();
             }
+            else
+            {
+                if (parkingspot.isAvailable()) {
+
+                    setAvailabilityAction(parkingspot.getId());
+                } else {
+                    Toast.makeText(context, "Parking spot is already marked as available!"
+                            , Toast.LENGTH_SHORT).show();
+                }
+            }
+
         });
 
     }//OBH
@@ -148,6 +164,7 @@ public class ParkingSpotAdapter extends RecyclerView.Adapter<ParkingSpotAdapter.
     }
 
     public void delete_parking(String id) {
+
         Log.d(TAG, " delete_parking function in process");
         //build retrofit request
         Retrofit retrofit = new Retrofit.Builder()

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -209,22 +210,15 @@ public class CoordinatesActivity extends Activity {
 
 
     private void saveParkInfo() {
-//        textview_city = (TextView) findViewById(R.id.coordinates_city);
+
+
+        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        String token=preferences_token.getString("token", null);
+
         String city = textview_city.getText().toString();
-
-//        textview_parkingNumber = (TextView) findViewById(R.id.coordinates_parkingNumber);
         int parkingNumber = Integer.parseInt(textview_parkingNumber.getText().toString());
-
-//        textview_address = (TextView) findViewById(R.id.coordinates_address);
         String address = textview_address.getText().toString();
-//        Gson gson = new GsonBuilder()
-//                .setLenient()
-//                .create();
-//        //build retrofit request
-//        Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(Constants.BaseUrl)
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .build();
+
 
 
         Gson gson = new GsonBuilder()

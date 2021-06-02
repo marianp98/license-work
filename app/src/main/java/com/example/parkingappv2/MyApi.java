@@ -36,7 +36,7 @@ public interface MyApi {
     Call<ParkingSpot> claimSpot(
             @Header("Authorization") String authorization,
             @Field("id") String id,
-            @Field("claimed") String claimed
+            @Field("claimed") int claimed
     );
 
     @FormUrlEncoded
