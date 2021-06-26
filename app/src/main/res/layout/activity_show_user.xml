@@ -8,19 +8,19 @@
 
     <TextView
         android:id="@+id/user_name"
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
         android:layout_marginStart="51dp"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="12dp"
-        android:layout_gravity="left"
         android:layout_marginEnd="30dp"
+        android:layout_marginRight="30dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.109"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
-        tools:ignore="RtlHardcoded"
-        android:layout_marginRight="30dp" />
+        tools:ignore="RtlHardcoded" />
 
     <TextView
         android:id="@+id/textView6"
@@ -40,12 +40,12 @@
 
     <TextView
         android:id="@+id/user_username"
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
         android:layout_marginStart="51dp"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="12dp"
-        android:layout_gravity="left"
         android:layout_marginEnd="30dp"
         android:layout_marginRight="30dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -72,12 +72,12 @@
 
     <TextView
         android:id="@+id/user_phone"
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
         android:layout_marginStart="51dp"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="12dp"
-        android:layout_gravity="left"
         android:layout_marginEnd="30dp"
         android:layout_marginRight="30dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -88,12 +88,12 @@
 
     <TextView
         android:id="@+id/user_email"
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
         android:layout_marginStart="51dp"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="12dp"
-        android:layout_gravity="left"
         android:layout_marginEnd="30dp"
         android:layout_marginRight="30dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -139,7 +139,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:background="@drawable/logged_user_button_shape"
         android:text="@string/user_email_update"
+        app:backgroundTint="@color/green"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.192"
         app:layout_constraintStart_toStartOf="parent"
@@ -150,7 +152,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
+        android:background="@drawable/logged_user_button_shape"
         android:text="@string/user_phone_update"
+        app:backgroundTint="@color/green"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.267"
         app:layout_constraintStart_toStartOf="parent"
@@ -161,6 +165,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="128dp"
+        android:background="@drawable/login_button_shape"
         android:text="@string/user_delete"
         app:backgroundTint="@android:color/holo_red_dark"
         app:layout_constraintEnd_toEndOf="parent"

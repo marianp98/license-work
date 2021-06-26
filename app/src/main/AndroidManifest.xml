@@ -3,80 +3,125 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.parkingappv2">
     <!--
-         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
-         Google Maps Android API v2, but you must specify either coarse or fine
-         location permissions for the "MyLocation" functionality.
+         The ACCESS_COARSE/FINE_LOCATION permissions are not required to useGoogle Maps Android API v2
+         Coarse location is for network provider's location
+         fine location is for both GPS provider and network location provider
     -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
-
-        android:label="@string/app_name"
-        android:networkSecurityConfig="@xml/network_security_config"
         android:icon="@mipmap/my_logo_round"
-
+        android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.ParkingAppv2"
         android:usesCleartextTraffic="true"
         tools:replace="theme">
-        <activity android:name=".activities.MainActivity"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".updates.EmailUpdate"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".updates.PhoneUpdate"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activities.ShowUserActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activities.ShowParkingActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activities.SetAvailabilityActivity"
-            android:screenOrientation="portrait"/>
+
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
-             Note that the API key is linked to the encryption key used to sign the APK.
-             You need a different API key for each encryption key, including the release key that is used to
-             sign the APK for publishing.
-             You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity
-            android:name=".activities.MapsActivity"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_maps" />
-        <activity android:name=".activities.CoordinatesActivity" />
 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
 
-        <activity android:name=".activities.LoggedUserActivity"
-        android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
-        android:screenOrientation="portrait"
-            />
-        <activity android:name=".activities.RegisterActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activities.LoginActivity"
-            android:screenOrientation="portrait">
+
+        <activity
+            android:name=".splashscreens.MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.ParkingAppv2">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
+
+
+        <activity
+            android:name=".activities.LoginActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.ParkingAppv2">
+            <!--            <intent-filter>-->
+            <!--                <action android:name="android.intent.action.MAIN" />-->
+            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
+            <!--            </intent-filter>-->
+        </activity>
+
+
+        <activity
+            android:name=".activities.RegisterActivity"
+            android:label="Register"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.ParkingAppv2" />
+
+        <activity
+            android:name=".splashscreens.SecondSplashAfterLogin"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.ParkingAppv2" />
+
+        <activity
+            android:name=".activities.LoggedUserActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.ParkingAppv2" />
+
+        <activity
+            android:name=".activities.ShowParkingActivity"
+            android:label="Your Parkingspots"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activities.MapsActivity"
+            android:label="@string/title_activity_maps"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activities.CoordinatesActivity"
+            android:label="Geolocation "
+
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activities.SetAvailabilityActivity"
+            android:label="Availability Interval"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activities.ShowUserActivity"
+            android:label="User Information"
+            android:screenOrientation="portrait" />
+
+
+        <activity
+            android:name=".updates.EmailUpdate"
+            android:label="Email Update"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".updates.PhoneUpdate"
+            android:label="Phone Number Update"
+            android:screenOrientation="portrait" />
+
+
     </application>
+
 
 </manifest>

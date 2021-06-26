@@ -1,43 +1,27 @@
 package com.example.parkingappv2.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Criteria;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.parkingappv2.Constants;
 import com.example.parkingappv2.MyApi;
-import com.example.parkingappv2.adapters.ParkingSpotAdapter;
 import com.example.parkingappv2.R;
+import com.example.parkingappv2.adapters.ParkingSpotAdapter;
 import com.example.parkingappv2.models.Availability;
 import com.example.parkingappv2.models.ParkingSpot;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,11 +35,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ShowParkingActivity extends AppCompatActivity implements LocationListener {
+public class ShowParkingActivity extends AppCompatActivity {
     private static final String TAG = "ShowParkingActivity";
     public FloatingActionButton add_button;
-    Location mLastLocation;
-    GoogleApiClient mGoogleApiClient;
     private RecyclerView mRecyclerView;
     private ParkingSpotAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -78,52 +60,8 @@ public class ShowParkingActivity extends AppCompatActivity implements LocationLi
 
     }//oc
 
-    public void onLocationChanged(Location location) {
-        mLastLocation = location;
-
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-
-
-        LocationManager locationManager = (LocationManager)
-                getSystemService(Context.LOCATION_SERVICE);
-        String provider = locationManager.getBestProvider(new Criteria(), true);
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        Location locations = locationManager.getLastKnownLocation(provider);
-        List<String> providerList = locationManager.getAllProviders();
-        if (null != locations && null != providerList && providerList.size() > 0) {
-            double longitude = locations.getLongitude();
-            double latitude = locations.getLatitude();
-            Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-            try {
-                List<Address> listAddresses = geocoder.getFromLocation(latitude,
-                        longitude, 1);
-                if (null != listAddresses && listAddresses.size() > 0) {
-                    String state = listAddresses.get(0).getAdminArea();
-                    String country = listAddresses.get(0).getCountryName();
-                    String subLocality = listAddresses.get(0).getSubLocality();
-
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (mGoogleApiClient != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,
-                    this);
-        }
-    }
 
     private void show_parking() {
-        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        String token=preferences_token.getString("token", null);
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
@@ -134,22 +72,18 @@ public class ShowParkingActivity extends AppCompatActivity implements LocationLi
             @Override
             public void onResponse(@NotNull Call<List<ParkingSpot>> call, @NotNull Response<List<ParkingSpot>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    Log.println(Log.DEBUG, TAG, response.body().toString() + "TEST");
 
-
+                    if (response.body().size() == 0) {
+                        Toast.makeText(ShowParkingActivity.this, "You have no ParkingSpots attached", Toast.LENGTH_SHORT).show();
+                    }
                     mParkingSpots = new ArrayList<>();
                     mParkingSpots.clear();
                     mParkingSpots.addAll(response.body());
                     Log.e(TAG, "onResponse: got parking slots of total: " + response.body().size());
-//                    Log.e(TAG, "onResponse v1: "+response.body().get(0).isClaimed());
 
-                    //before building the recycler view, you have to check
-                    //if the Parking is available or not
-                    //so that we can update the "Make Available" button
+                    final List<ParkingSpot> parkingSpots = SortSpots(response.body());
 
-                    //for this we have to get Availability Dates from server
-                    //so we will hit a new API
-                    getAvailabilitySlots1();
+                    buildRecyclerView(parkingSpots);
                 }
             }//res
 
@@ -162,24 +96,6 @@ public class ShowParkingActivity extends AppCompatActivity implements LocationLi
     }//end show parking
 
 
-    private void buildParkingList(Response<JsonArray> response, ArrayList<ParkingSpot> parkingList, int array_size) {
-        for (int i = 0; i < array_size; i++) {
-//            String town=response.body().get(i).getAsJsonObject().get("town").getAsString();
-            String final_address = response.body().get(i).getAsJsonObject().get("address").getAsString();
-            String final_parking_Number = response.body().get(i).getAsJsonObject().get("parkingNumber").getAsString();
-            String id = response.body().get(i).getAsJsonObject().get("id").getAsString();
-//            String latitude=response.body().get(i).getAsJsonObject().get("latitude").getAsString();
-            //           String longitude=response.body().get(i).getAsJsonObject().get("longitude").getAsString();
-//            String user_id=response.body().get(i).getAsJsonObject().get("user_id").getAsString();
-
-//            parkingList.add(new ParkingSpot(R.drawable.ic_android, final_address, "Parking Number: "+final_parking_Number));
-
-            //parkingList.add(new ParkingSpot(id, final_address, "Parking Number: " + final_parking_Number));
-
-        }
-
-    }
-
     private void buildRecyclerView(List<ParkingSpot> parkingList) {
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
@@ -188,13 +104,10 @@ public class ShowParkingActivity extends AppCompatActivity implements LocationLi
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
-
         mAdapter.setOnItemClickListener(new ParkingSpotAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                Toast.makeText(ShowParkingActivity.this, "TEST", Toast.LENGTH_SHORT).show();
-                //  parkingList.get(position).changeText1("test");
-                mAdapter.notifyItemChanged(position);//
+                mAdapter.notifyItemChanged(position);
             }
 
             @Override
@@ -204,16 +117,15 @@ public class ShowParkingActivity extends AppCompatActivity implements LocationLi
 
             @Override
             public void refreshActivity() {
+                Toast.makeText(getApplicationContext(), Constants.success_parking_delete, Toast.LENGTH_SHORT).show();
                 Intent intent = getIntent();
                 overridePendingTransition(0, 0);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 finish();
                 overridePendingTransition(0, 0);
                 startActivity(intent);
-
             }
         });
-
     }
 
     private void add_parking() {
@@ -231,103 +143,74 @@ public class ShowParkingActivity extends AppCompatActivity implements LocationLi
         return retrofit.create(MyApi.class);
     }//end get
 
-    private void getAvailabilitySlots1() {
-        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        String token=preferences_token.getString("token", null);
-
-        SharedPreferences preferences_user_id = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        String user_id=preferences_user_id.getString("user_id", null);
-        Gson gson = new GsonBuilder()
-                .setLenient()
-                .create();
-        Call<List<Availability>> call = getRetrofit(gson).getAvailableSlots1(
-                Constants.bearerToken,
-                user_id
-        );
-        //execute
-        call.enqueue(new Callback<List<Availability>>() {
-            @Override
-            public void onResponse(@NotNull Call<List<Availability>> call, @NotNull Response<List<Availability>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Log.e(TAG, "onResponse: got list of size: " + response.body().size());
-
-                    //pass the time slots to check the availability
-                    final List<ParkingSpot> parkingSpots = isParkingAvailable(response.body());
-                   // Log.d(TAG, "onResponse v2: "+response.body().get(0).getClaimed());
-
-                    //update UI (setup recycler view)
-                    buildRecyclerView(parkingSpots);
-                }
-            }//response
-
-            @Override
-            public void onFailure(@NotNull Call<List<Availability>> call, @NotNull Throwable t) {
-                Log.e(TAG, "onFailure:", t);
-                Toast.makeText(ShowParkingActivity.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
-            }//fail
-        });
-    }//end get
-
-    private List<ParkingSpot> isParkingAvailable(List<Availability> timeSlots) {
+    private List<ParkingSpot> SortSpots(List<ParkingSpot> timeSlots) {
         Log.e(TAG, "isParkingAvailable: validating parking slots...");
 
-        //1- list of avail time slots on server & the parking spots should be of same size
         final int availableSlots = timeSlots.size();
         final int availableParkingSpots = mParkingSpots.size();
         List<ParkingSpot> filteredParkingSpots = new ArrayList<>();
+        filteredParkingSpots.clear();
 
-//        if (availableSlots == availableParkingSpots) {
+        for (int i = 0; i < availableParkingSpots; i++)
+            if (timeSlots.get(i).getClaimed() == 1) {
+                if (!compareTimes(timeSlots.get(i).getStop_date(), getCurrentDateTime())) {
+                    Log.e(TAG, "SortSpots1: " + timeSlots.get(i).getStop_date() + " VS " + getCurrentDateTime() + " = " + compareTimes(timeSlots.get(i).getStop_date(), getCurrentDateTime()));
+                    unclaim_spot(timeSlots.get(i).getId(), filteredParkingSpots);
+                    //delete_availability(timeSlots.get(i).getId());
+                }
+            }
+        for (int i = 0; i < availableParkingSpots; i++) {
+            if (timeSlots.get(i).getAvailable() == 1) {
+                if (!compareTimes(timeSlots.get(i).getStop_date(), getCurrentDateTime())) {
+                    Log.e(TAG, "SortSpots2: " + timeSlots.get(i).getStop_date() + " VS " + getCurrentDateTime() + " = " + compareTimes(timeSlots.get(i).getStop_date(), getCurrentDateTime()));
+                    set_parking_available(timeSlots.get(i).getId());
+                    unclaim_spot(timeSlots.get(i).getId(), filteredParkingSpots);
+                    //delete_availability(timeSlots.get(i).getId());
+                    Log.e(TAG, "SortSpots: Availability expirat");
+                }
+            }
+        }
 
         for (int i = 0; i < availableParkingSpots; i++) {
+            if (timeSlots.get(i).getAvailable() == 1) {
 
-            if (i < availableSlots) {
-                //make sure we are talking about the same parking spot
-                if (mParkingSpots.get(i).getId().equals(timeSlots.get(i).getParkingspot_id())) {
-                    //now we check if the stop date has reached or not
+                //   finally we add a Parking Spot marked as unposted, posted(=available) or claimed.
+                final String currentTime = getCurrentDateTime();
+                final String endTime = timeSlots.get(i).getStop_date();
+                Log.e(TAG, "isParkingAvailable: currentTime: " + currentTime + "\n End Time: " + endTime);
+                final boolean isSpotAvailable = compareTimes(currentTime, endTime);
+                int available = isSpotAvailable ? 0 : 1;
 
-                    final String currentTime = getCurrentDateTime();
-                    final String endTime = timeSlots.get(i).getStop_date();
-                    Log.e(TAG, "isParkingAvailable: currentTime: " + currentTime + "\n End Time: " + endTime);
-                    final boolean isSpotAvailable = compareTimes(currentTime, endTime);
-
-                    //finally we add a Parking Spot marked as avail or un-avail
-                    final ParkingSpot currentSpot = mParkingSpots.get(i);
-                    filteredParkingSpots.add(new ParkingSpot
-                            (
-                                    currentSpot.getId(),
-                                    currentSpot.getAddress(),
-                                    currentSpot.getParkingNumber(),
-                                    isSpotAvailable,
-                                    currentSpot.getClaimed()
-
-                            ));
-                    if(currentSpot.getClaimed()==1)
-                        Log.e(TAG, "isParkingAvailable1: "+"ISCLAIMED = 1");
-                    if(currentSpot.getClaimed() ==0)
-                        Log.e(TAG, "isParkingAvailable1: "+"ISCLAIMED = 0");
-                    Log.e(TAG, "isParkingAvailable1: "+"TESTTTTTTTTT = 0");
-
-
-                }//end if
-            }//if time slots are in range ->>
-            else {
                 final ParkingSpot currentSpot = mParkingSpots.get(i);
                 filteredParkingSpots.add(new ParkingSpot
                         (
                                 currentSpot.getId(),
                                 currentSpot.getAddress(),
                                 currentSpot.getParkingNumber(),
-                                true,
+                                available,
                                 currentSpot.getClaimed()
+
                         ));
-                if(currentSpot.getClaimed() ==1)
-                    Log.e(TAG, "isParkingAvailable2: "+"ISCLAIMED = 1");
+                Log.e(TAG, "SortSpots: getAvailabi() == 1!");
+
+            } else {
+                final ParkingSpot currentSpot = mParkingSpots.get(i);
+                filteredParkingSpots.add(new ParkingSpot
+                        (
+                                currentSpot.getId(),
+                                currentSpot.getAddress(),
+                                currentSpot.getParkingNumber(),
+                                0,
+                                0));
+                Log.e(TAG, "SortSpots: getClaimed() == 0 & availability=0!");
             }
 
+            Log.e(TAG, "isParkingAvailable: " + filteredParkingSpots.toString());
         }
-        Log.e(TAG, "isParkingAvailable3: "+filteredParkingSpots.toString());
+        //end
         return filteredParkingSpots;
-    }//end
+    }
+
 
     private boolean compareTimes(String currentTime, String endTime) {
         boolean avail = false;
@@ -360,6 +243,104 @@ public class ShowParkingActivity extends AppCompatActivity implements LocationLi
         return formatter.format(new Date(System.currentTimeMillis()));
     }
 
-    //______________________________________________________________________________________________
+    void set_parking_available(String parkingspot_id) {
 
-}//end class
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+        //build retrofit request
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Constants.BaseUrl)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+
+        //MyApi api = retrofit.create(MyApi.class);
+        Call<ParkingSpot> call = retrofit.create(MyApi.class).availableSpot(
+                Constants.bearerToken,
+                parkingspot_id,
+                0
+        );
+
+        call.enqueue(new Callback<ParkingSpot>() {
+            @Override
+            public void onResponse(@NotNull Call<ParkingSpot> call, @NotNull retrofit2.Response<ParkingSpot> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.println(Log.DEBUG, TAG, response.toString() + "available from 0 to 1 !");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ParkingSpot> call, Throwable t) {
+                Toast.makeText(ShowParkingActivity.this, Constants.error_availability, Toast.LENGTH_SHORT).show();
+                Log.e("RETROFIT", "onFailure: " + t.getLocalizedMessage());
+            }
+        });
+    }
+
+    private void unclaim_spot(String id, List<ParkingSpot> filteredList) {
+        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        String token = preferences_token.getString("token", null);
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+        //build retrofit request
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Constants.BaseUrl)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+
+        MyApi api = retrofit.create(MyApi.class);
+        Call<ParkingSpot> call = api.claimSpot(
+                Constants.bearerToken,
+                id,
+                0
+        );
+        call.enqueue(new Callback<ParkingSpot>() {
+            @Override
+            public void onResponse(Call<ParkingSpot> call, retrofit2.Response<ParkingSpot> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.e(TAG, "onResponse: The Expired ParkingSpot was successfully unclaimed");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ParkingSpot> call, Throwable t) {
+                Toast.makeText(ShowParkingActivity.this, Constants.error_availability, Toast.LENGTH_SHORT).show();
+                Log.e("RETROFIT", "onFailure: " + t.getLocalizedMessage());
+            }
+        });
+    }
+
+
+    public void delete_availability(String id) {
+        Log.d(TAG, " delete_parking availability in process");
+        //build retrofit request
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Constants.BaseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        Call<Availability> call = retrofit.create(MyApi.class).deleteAvailability(
+                Constants.bearerToken,
+                id
+        );
+
+        call.enqueue(new Callback<Availability>() {
+
+            @Override
+            public void onResponse(Call<Availability> call, retrofit2.Response<Availability> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.d(TAG, "Availability successfully deleted ---> " + response.body().toString());
+                    //mListener.refreshActivity();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Availability> call, Throwable t) {
+                Log.e("RETROFIT", "onFailure: " + t.getLocalizedMessage());
+                Log.d(TAG, Constants.fail_general);
+            }
+        });
+        Log.d(TAG, " delete_parking function executed");
+    }
+}

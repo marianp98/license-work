@@ -1,10 +1,5 @@
 package com.example.parkingappv2.activities;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,12 +9,17 @@ import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.parkingappv2.Constants;
 import com.example.parkingappv2.MyApi;
@@ -34,23 +34,27 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class LoggedUserActivity extends AppCompatActivity {
     private static final String TAG = "LoggedUserActivity";
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
-
+    public static final String Checkbox_Shared_Pref = "checkbox";
+    public static final String PREFS_NAME = "MyPrefsFile";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logged_user);
+
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             statusCheck();
             checkLocationPermission();
         }
-        Button show_parkings=findViewById(R.id.show_parkings_button);
+
+        Button show_parkings = findViewById(R.id.show_parkings_button);
         show_parkings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ShowParkingsAction();
             }
         });
-        Button show_user=findViewById(R.id.view_info_button);
+
+        Button show_user = findViewById(R.id.view_info_button);
         show_user.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,7 +62,7 @@ public class LoggedUserActivity extends AppCompatActivity {
             }
         });
 
-        Button mark_button=findViewById(R.id.mark_button);
+        Button mark_button = findViewById(R.id.mark_button);
         mark_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,7 +71,7 @@ public class LoggedUserActivity extends AppCompatActivity {
             }
         });
 
-        Button  logout = findViewById(R.id.logged_user_logout_button);
+        Button logout = findViewById(R.id.logged_user_logout_button);
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,36 +79,29 @@ public class LoggedUserActivity extends AppCompatActivity {
             }
         });
 
-//        SharedPreferences sharedPreferences=getSharedPreferences ("name",MODE_PRIVATE);
-//        String name= sharedPreferences.getString("name", null);
         SharedPreferences preferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        String name=preferences.getString("name", null);
-        TextView welcome_message_tv= findViewById(R.id.welcome_user_message);
-        Log.e(TAG, "onCreate: The name received is" +name );
-        if(name != null)
-        {
-            welcome_message_tv.setText("Welcome to the ParkingSpot, "+name);
-        }
+        String name = preferences.getString("name", null);
+        TextView welcome_message_tv = findViewById(R.id.welcome_user_message);
+//        Log.e(TAG, "onCreate: The name received is" + name);
 
+        welcome_message_tv.setText("Choose the option that interests you");
 
     }
 
     private void ShowUserAction() {
-        Intent show_user=new Intent(this, ShowUserActivity.class);
+        Intent show_user = new Intent(this, ShowUserActivity.class);
         startActivity(show_user);
     }
 
     private void ShowParkingsAction() {
-        Intent show_parkings=new Intent(this, ShowParkingActivity.class);
+        Intent show_parkings = new Intent(this, ShowParkingActivity.class);
         startActivity(show_parkings);
     }
 
     public void statusCheck() {
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             buildAlertMessageNoGps();
-
         }
     }
 
@@ -155,15 +152,13 @@ public class LoggedUserActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int id) {
                         Intent i = new Intent(getApplicationContext(),
                                 LoginActivity.class);
-                      //  Log.d(TAG,"Token Revoked1");
                         Logout();
-                        SharedPreferences preferences=getSharedPreferences("checkbox", MODE_PRIVATE);
-                        SharedPreferences.Editor editor=preferences.edit();
+                        SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
                         editor.putString("remember", "false");
                         editor.apply();
                         finishAffinity();
                         startActivity(i);
-                       // Log.d(TAG,"Token Revoked2");
                     }
                 });
         builder.setNegativeButton("No",
@@ -176,16 +171,12 @@ public class LoggedUserActivity extends AppCompatActivity {
         alert11.show();
     }
 
-    private void LocationAction()
-    {
-        Intent location_intent=new Intent(this, MapsActivity.class);
+    private void LocationAction() {
+        Intent location_intent = new Intent(this, MapsActivity.class);
         startActivity(location_intent);
     }
 
-    private void Logout()
-    {
-        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        String token=preferences_token.getString("token", null);
+    private void Logout() {
         //Calling the Logout API in order to revoke the User's token
 
         //build retrofit request
@@ -202,8 +193,9 @@ public class LoggedUserActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<MyResponse> call, retrofit2.Response<MyResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    Toast.makeText(LoggedUserActivity.this, response.body().getMessage(),
-                            Toast.LENGTH_SHORT).show();
+                    Toast toast = Toast.makeText(LoggedUserActivity.this, Constants.success_logout, Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
+                    toast.show();
                 }
             }
 

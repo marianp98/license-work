@@ -31,33 +31,65 @@ android {
 }
 
 dependencies {
-    implementation 'com.appolica:interactive-info-window:v1.0.6'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.google.android.material:material:1.3.0'
-    implementation 'androidx.annotation:annotation:1.1.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
-    implementation 'androidx.navigation:navigation-fragment:2.2.2'
-    implementation 'androidx.navigation:navigation-ui:2.2.2'
-    implementation 'com.google.android.libraries.places:places:2.2.0'
-    testImplementation 'junit:junit:4.+'
+
+    //Expose metadata that helps tools and other developers understand your app's code.
+    implementation 'androidx.annotation:annotation:1.2.0'
+
+    //Lifecycle-aware components perform actions in response to a change in the lifecycle status of another component,
+    // such as activities and fragments. These components help you produce better-organized, and often lighter-weight code, that is easier to maintain.
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
+
+
+    //Navigation is a framework for navigating between 'destinations' within an Android application
+    // that provides a consistent API whether destinations are implemented as Fragments, Activities, or other components.
+    implementation 'androidx.navigation:navigation-fragment:2.3.5'
+    implementation 'androidx.navigation:navigation-ui:2.3.5'
+
+
+    // Testing
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-    implementation 'com.android.volley:volley:1.2.0'
-    implementation 'com.google.code.gson:gson:2.8.5'
-    implementation 'androidx.recyclerview:recyclerview:1.2.0'
-    implementation 'androidx.cardview:cardview:1.0.0'
-    implementation'com.google.android.gms:play-services-location:18.0.0'
-    implementation 'com.google.android.gms:play-services-maps:17.0.0'
-    implementation 'com.karumi:dexter:6.2.2'
-    implementation 'androidx.multidex:multidex:2.0.1'
 
-    //retrofit
+
+    //Request permissions
+    implementation 'com.karumi:dexter:6.2.2'
+
+
+    //retrofit library for HTTP Requests
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.9.0"))
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
+
+    //Volley library for HTTP Requests
+    implementation 'com.android.volley:volley:1.2.0'
+
+
+    //text fade transition
+    implementation 'com.tomer:fadingtextview:2.5'
+
+
+    //dalvik executable --> Google's virtual machine processor (Dalvik) uses to handle Android Applications
+    //MultiDex integration in Android Studio allows Android Developers the ability to compile and execute a code-base with over 65,536 methods!
+    implementation 'androidx.multidex:multidex:2.0.1'
+
+
+    //Google Services, Location & Places & Others
+    implementation 'com.google.android.gms:play-services-location:18.0.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.1'
+    implementation 'com.google.android.libraries.places:places:2.4.0'
+    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
+
+
+    //Design & not only -> cardview, recyclerview
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'com.appolica:interactive-info-window:v1.0.6'
+
 }

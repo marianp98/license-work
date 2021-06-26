@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -22,13 +21,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.parkingappv2.Constants;
 import com.example.parkingappv2.MyApi;
-import com.example.parkingappv2.MyResponse;
 import com.example.parkingappv2.R;
+import com.example.parkingappv2.models.ParkingSpot;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
@@ -43,12 +43,9 @@ import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class CoordinatesActivity extends Activity {
-    protected LocationManager locationManager;
-    protected Context context;// this is a memory leak!
+public class CoordinatesActivity extends AppCompatActivity {
     private double lat;
     private double lng;
-    private int parkingNumber;
     private Button save_button;
     private FusedLocationProviderClient fusedLocationClient;
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
@@ -64,26 +61,26 @@ public class CoordinatesActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_coordinates);
+
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             statusCheck();
             checkLocationPermission();
         }
+
+
         textview_address = findViewById(R.id.coordinates_address);
         textview_city = findViewById(R.id.coordinates_city);
         textview_parkingNumber = findViewById(R.id.coordinates_parkingNumber);
         save_button = findViewById(R.id.save_button);
 
-        textview_address.addTextChangedListener(loginTextWatcher);
-        textview_city.addTextChangedListener(loginTextWatcher);
-        textview_city.addTextChangedListener(loginTextWatcher);
-        textview_parkingNumber.addTextChangedListener(loginTextWatcher);
-
+        textview_address.addTextChangedListener(parkingNumberWatcher);
+        textview_city.addTextChangedListener(parkingNumberWatcher);
+        textview_parkingNumber.addTextChangedListener(parkingNumberWatcher);
 
         popupMessage();
 
         //init location provider client
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
 
         //get last known location (current location if available)
         getCurrentLocation();
@@ -95,30 +92,30 @@ public class CoordinatesActivity extends Activity {
             }
         });
     }
-    public void popupMessage(){
+
+    public void popupMessage() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage(Constants.message1+"\n"+Constants.message2);
-       // alertDialogBuilder.setIcon(R.drawable.ic_launcher_background);
+        alertDialogBuilder.setMessage(Constants.message1 + "\n" + Constants.message2);
         alertDialogBuilder.setTitle("Attention!");
-        alertDialogBuilder.setNegativeButton("ok", new DialogInterface.OnClickListener(){
+        alertDialogBuilder.setNegativeButton("ok", new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Log.d(TAG,"Acknowledge Displayed");
-                // add these two lines, if you wish to close the app:
+                Log.d(TAG, "Acknowledge Displayed");
+                // add these two lines in order to close the app:
                 // finishAffinity();
-               // System.exit(0);
+                // System.exit(0);
             }
         });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
+
     public void statusCheck() {
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             buildAlertMessageNoGps();
-
         }
     }
 
@@ -183,9 +180,9 @@ public class CoordinatesActivity extends Activity {
     private void updateUIWithLocationInfo() {
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
 
-        List<Address> addresses = null; // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+        List<Address> addresses = null;
         try {
-            addresses = geocoder.getFromLocation(lat, lng, 1);
+            addresses = geocoder.getFromLocation(lat, lng, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
 
             String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
             String city = addresses.get(0).getLocality();
@@ -210,16 +207,9 @@ public class CoordinatesActivity extends Activity {
 
 
     private void saveParkInfo() {
-
-
-        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        String token=preferences_token.getString("token", null);
-
         String city = textview_city.getText().toString();
         int parkingNumber = Integer.parseInt(textview_parkingNumber.getText().toString());
         String address = textview_address.getText().toString();
-
-
 
         Gson gson = new GsonBuilder()
                 .setLenient()
@@ -229,7 +219,7 @@ public class CoordinatesActivity extends Activity {
                 .baseUrl(Constants.BaseUrl)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
-        Call<MyResponse> call = retrofit.create(MyApi.class).postParkLocation
+        Call<ParkingSpot> call = retrofit.create(MyApi.class).postParkLocation
                 (
                         Constants.bearerToken,
                         city,
@@ -237,20 +227,19 @@ public class CoordinatesActivity extends Activity {
                         parkingNumber,
                         lat,
                         lng,
-                        0
+                        0,
+                        0,
+                        "2021-01-01 14:13",
+                        "2021-01-01 14:13"
                 );
-        call.enqueue(new Callback<MyResponse>() {
+        call.enqueue(new Callback<ParkingSpot>() {
             @Override
-            public void onResponse(Call<MyResponse> call, retrofit2.Response<MyResponse> response) {
+            public void onResponse(Call<ParkingSpot> call, retrofit2.Response<ParkingSpot> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    Toast.makeText(CoordinatesActivity.this, response.body().getMessage(),
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CoordinatesActivity.this, Constants.coordinates_success, Toast.LENGTH_SHORT).show();
                     new CountDownTimer(1000, 1000) {
                         public void onFinish() {
                             // When timer is finished
-
-                           // CoordinatesActivity.super.onBackPressed();
-
                             Intent i = new Intent(getApplicationContext(), ShowParkingActivity.class);
                             finish();
                             startActivity(i);
@@ -260,19 +249,20 @@ public class CoordinatesActivity extends Activity {
                             // millisUntilFinished    The amount of time until finished.
                         }
                     }.start();
+                } else {
+                    Toast.makeText(CoordinatesActivity.this, Constants.coordinates_fail, Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<MyResponse> call, Throwable t) {
+            public void onFailure(Call<ParkingSpot> call, Throwable t) {
+                Toast.makeText(CoordinatesActivity.this, Constants.coordinates_fail, Toast.LENGTH_SHORT).show();
                 Log.e("RETROFIT", "onFailure: " + t.getLocalizedMessage());
             }
         });
-
     }
 
-
-    private TextWatcher loginTextWatcher = new TextWatcher() {
+    private final TextWatcher parkingNumberWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
         }
@@ -283,7 +273,14 @@ public class CoordinatesActivity extends Activity {
             String cityInput = textview_city.getText().toString().trim();
             String parkingNumberInput = textview_parkingNumber.getText().toString().trim();
 
-            save_button.setEnabled(!addressInput.isEmpty() && !cityInput.isEmpty() && !parkingNumberInput.isEmpty());
+            if (!addressInput.isEmpty() && !cityInput.isEmpty() && !parkingNumberInput.isEmpty()) {
+                save_button.setEnabled(true);
+                save_button.setBackgroundResource(R.drawable.signup_button_shape);
+
+            } else {
+                save_button.setEnabled(false);
+                save_button.setBackgroundResource(R.drawable.login_button_shape);
+            }
         }
 
         @Override

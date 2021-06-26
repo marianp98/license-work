@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -43,6 +45,8 @@ public class EmailUpdate extends AppCompatActivity {
                 update_email();
             }
         });
+        updated=findViewById(R.id.changeTextEmail);
+        updated.addTextChangedListener(emailUpdateTextWatcher);
     }
 
     private void update_email() {
@@ -86,6 +90,10 @@ public class EmailUpdate extends AppCompatActivity {
                         }
                     }.start();
                 }
+                else
+                {
+                    Toast.makeText(EmailUpdate.this, Constants.error_email_update, Toast.LENGTH_SHORT).show();
+                }
             }
             @Override
             public void onFailure(Call<JsonObject>call, Throwable t) {
@@ -94,4 +102,27 @@ public class EmailUpdate extends AppCompatActivity {
             }
         });
     }
+    private TextWatcher emailUpdateTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            String newEmail = updated.getText().toString().trim();
+
+            if (!newEmail.isEmpty() ) {
+                save_button.setEnabled(true);
+                save_button.setBackgroundResource(R.drawable.signup_button_shape);
+
+            } else {
+                save_button.setEnabled(false);
+                save_button.setBackgroundResource(R.drawable.login_button_shape);
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+        }
+    };
 }

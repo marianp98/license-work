@@ -8,6 +8,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.parkingappv2.R;
@@ -15,49 +17,51 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
 public class CustomInfoWindowAdapter extends AppCompatActivity implements GoogleMap.InfoWindowAdapter {
+    //constants
+    private static final int CLAIMED = 1;
 
-    private static final String TAG = "CustomInfoWindowAdapter";
     private final View mWindow;
-    private Context mContext;
-    private View infoButtonListener;
+    private final Context mContext;
+    private final int mParkingSpotType;
 
-
-    public CustomInfoWindowAdapter(Context context) {
+    public CustomInfoWindowAdapter(Context context, int parkingSpotType) {
         mContext = context;
+        mParkingSpotType = parkingSpotType;
 
-        mWindow = LayoutInflater.from(context).inflate(R.layout.marker_window_layout, null);
-    }
+        /*parkingSpotType differentiates b/w claimed & un-claimed spots, hence we will inflate the info window layout accordingly*/
+        if (parkingSpotType == CLAIMED) {
+            mWindow = LayoutInflater.from(context).inflate(R.layout.marker_window_layout_claimed, null);
+        } else {
+            mWindow = LayoutInflater.from(context).inflate(R.layout.marker_window_layout, null);
+        }
+    }//constructor
 
-    private void rendowWindowText(Marker marker, View view){
+    private void renderWindowText(Marker marker, View view) {
 
         String title = marker.getTitle();
-        TextView tvTitle = (TextView) view.findViewById(R.id.title);
+        String snippet = marker.getSnippet();
 
+        TextView tvTitle = view.findViewById(R.id.title);
+        TextView tvSnippet = view.findViewById(R.id.snippet);
 
-        if(!title.equals("")){
+        if (title != null && !title.isEmpty()) {
             tvTitle.setText(title);
         }
 
-        String snippet = marker.getSnippet();
-        TextView tvSnippet = (TextView) view.findViewById(R.id.snippet);
-
-        if(!snippet.equals("")){
+        if (snippet != null && !snippet.isEmpty()) {
             tvSnippet.setText(snippet);
         }
 
-
-    }
+    }//renderWindowText
 
     @Override
-    public View getInfoWindow(Marker marker) {
-        rendowWindowText(marker, mWindow);
+    public View getInfoWindow(@NonNull Marker marker) {
+        renderWindowText(marker, mWindow);
         return mWindow;
     }
 
     @Override
-    public View getInfoContents(Marker marker) {
-        rendowWindowText(marker, mWindow);
+    public View getInfoContents(@NonNull Marker marker) {
         return mWindow;
     }
-
 }

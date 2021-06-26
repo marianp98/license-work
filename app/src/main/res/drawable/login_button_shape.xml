@@ -4,10 +4,10 @@
     android:thickness="10dp"
     >
     <solid android:color="#3d3d3d" />
-    <corners android:bottomRightRadius="4dp"
-        android:bottomLeftRadius="4dp"
-        android:topRightRadius="4dp"
-        android:topLeftRadius="4dp"
+    <corners android:bottomRightRadius="60dp"
+        android:bottomLeftRadius="60dp"
+        android:topRightRadius="60dp"
+        android:topLeftRadius="60dp"
         />
 </shape>
 

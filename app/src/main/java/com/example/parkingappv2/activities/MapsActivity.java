@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Criteria;
@@ -16,20 +15,14 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.text.Layout;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -40,22 +33,18 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-import com.appolica.interactiveinfowindow.InfoWindow;
 import com.example.parkingappv2.Constants;
 import com.example.parkingappv2.MyApi;
 import com.example.parkingappv2.R;
 import com.example.parkingappv2.adapters.CustomInfoWindowAdapter;
-import com.example.parkingappv2.adapters.OnInfoWindowElemTouchListener;
 import com.example.parkingappv2.models.Availability;
 import com.example.parkingappv2.models.ParkingSpot;
-import com.example.parkingappv2.updates.PhoneUpdate;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -72,24 +61,19 @@ import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -99,37 +83,25 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+        LocationListener, GoogleMap.OnMarkerClickListener {
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     private static final String TAG = "MapsActivity";
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     Marker mCurrLocationMarker;
-    Marker LocationMarker;
-    String[] longitudes;
-    String[] latitudes;
-    public String db_longitude;
-    public String db_latitude;
-    public String db_user_id;
-    public String db_address;
-    public String db_parkingNumber;
-    public String db_name;
-    public String db_availability;
-    public String db_parkingspotID;
-    public String db_claimed;
-    public String db_phone;
-    public String db_startTime;
-    public String db_stopTime;
-    private OnInfoWindowElemTouchListener infoButtonListener;
-    private View.OnClickListener listener1;
-    private DialogInterface.OnClickListener listener2;
+    private String db_longitude;
+    private String db_latitude;
+    private String db_user_id;
+    private String db_address;
+    private String db_parkingNumber;
+    private String db_name;
+    private String db_availability;
+    private String db_parkingspotID;
+    private String db_claimed;
+    private String db_phone;
+    private String db_startTime;
+    private String db_stopTime;
     protected boolean ver;
-
-    protected TextView user_id_tv;
-    protected Button claim_button;
-
-    protected View info_view;
-    public String url;
     LocationRequest mLocationRequest;
     private GoogleMap mMap;
     EditText editTextLocationSearch;
@@ -148,7 +120,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         SupportMapFragment mapFragment = (SupportMapFragment)
                 getSupportFragmentManager()
-                        .findFragmentById(R.id.map2);
+                        .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
 
@@ -196,88 +168,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Set latitude& longitude
             textView2LocationSearch.setText(String.valueOf(place.getLatLng()));
 
-            Log.e(TAG, "onActivityResult: " + place.getAddress()+place.getName() + place.getLatLng() );
+            Log.e(TAG, "onActivityResult: " + place.getAddress() + place.getName() + place.getLatLng());
 
-//            LatLng coordinate =  place.getLatLng();
-//            CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
-//                    coordinate, 15);
-//            mMap.animateCamera(location);
-
-
-
-
-            LatLng coordinate =  place.getLatLng();             MarkerOptions markerOptions = new MarkerOptions();
+            LatLng coordinate = place.getLatLng();
+            MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(coordinate);
-            markerOptions.title(place.getAddress()); //Here Total Address is address which you want to show on marker
-           // mMap.clear();
-
-
+            markerOptions.title(place.getAddress()); //Here Total Address is address which we want to show on marker
+            markerOptions.snippet(" ");
             markerOptions.icon(
                     BitmapDescriptorFactory
                             .defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-
             markerOptions.getPosition();
             mCurrLocationMarker = mMap.addMarker(markerOptions);
             mMap.moveCamera(CameraUpdateFactory.newLatLng(coordinate));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
-
 
         } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
             //When error -> Initialize status
             Status status = Autocomplete.getStatusFromIntent(data);
 
             //Display toast message
+            //           Toast.makeText(getApplicationContext(), status.getStatusMessage(), Toast.LENGTH_SHORT).show();
             Toast.makeText(getApplicationContext(), status.getStatusMessage(), Toast.LENGTH_SHORT).show();
+
         }
     }
-
-
-    private void init() {
-        Log.d(TAG, "init: initializing");
-
-        editTextLocationSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH
-                        || actionId == EditorInfo.IME_ACTION_DONE
-                        || event.getAction() == KeyEvent.ACTION_DOWN
-                        || event.getAction() == KeyEvent.KEYCODE_ENTER) {
-                    geolocate();
-                }
-
-                return false;
-            }
-        });
-    }
-
-    private void geolocate()
-    {
-        String searchString=editTextLocationSearch.getText().toString();
-        Geocoder geocoder= new Geocoder((MapsActivity.this));
-        List<Address> list= new ArrayList<>();
-        try {
-            list=geocoder.getFromLocationName(searchString,1);
-        }
-        catch (IOException e)
-        {
-            Log.e(TAG, "geolocate: IOException: "+ e.getMessage() );
-        }
-        if(list.size() >0)
-        {
-            Address address=list.get(0);
-            Log.e(TAG, "geolocate: " + address.toString() );
-        }
-
-
-    }
-
-
 
     public void statusCheck() {
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             buildAlertMessageNoGps();
-
         }
     }
 
@@ -307,7 +227,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
-        mMap.setPadding(0, 150, 0, 0);
+        mMap.setPadding(0, 200, 0, 0);
 
         //Initialize Google Play Services
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -321,9 +241,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
-
         getData();
-      //  init();
+        //    mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
     }
 
@@ -385,15 +304,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     String state = listAddresses.get(0).getAdminArea();
                     String country = listAddresses.get(0).getCountryName();
                     String subLocality = listAddresses.get(0).getSubLocality();
-
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
-        //first_function(markerOptions, latLng);
-        first_function(markerOptions, latLng);
+        initialization(markerOptions, latLng);
         if (mGoogleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,
                     this);
@@ -428,6 +344,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_LOCATION: {
                 if (grantResults.length > 0
@@ -457,12 +374,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Availability availability = new Availability(user_id, availabilityy, parkingspotID, startTime, stopTime, claimed);
         final String currentTime = getCurrentDateTime();
         Log.d(TAG, "isParkingAvailable: currentTime: " + currentTime + "\n End Time: " + db_stopTime);
-        final boolean isSpotAvailable = compareTimes(currentTime, db_stopTime);
-        // Add a marker  and move the camera
+
         LatLng marker = new LatLng(latitudine, longitudine);
 
         MarkerOptions markerOptions = new MarkerOptions();
-        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this));
 
         Marker mark = null;
         if (user_id.equals(Constants.user_id)) {
@@ -470,65 +385,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .snippet("Address: " + address +
                             '\n' + "Parking Number: " + db_parkingNumber +
                             "\n" + "Phone Number: " + db_phone +
-                            "\n" + "Available until " + db_stopTime +
-                            "\n" + "                 UNAVAILABLE")
+                            "\n" + "Available until " + db_stopTime)
 
             );
-            //mark.setTag(db_user_id);
             mark.setTag(availability);
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));//here you can change the color
             mMap.moveCamera(CameraUpdateFactory.newLatLng(marker));
         } else {
             if (Integer.parseInt(claimed) == 1) {
-                //**************************************************************************************  boolean isSpotClaimed = compareTimes(currentTime, stopTime);
-
-                mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this));
 
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                 mark = mMap.addMarker(markerOptions.position(marker).title("Parking Owner: " + db_name)
                         .snippet("Address: " + address +
                                 '\n' + "Parking Number: " + db_parkingNumber +
                                 "\n" + "Phone Number: " + db_phone +
-                                "\n" + "Available until " + db_stopTime +
-                                "\n" + "                 CLAIMED")
+                                "\n" + "Available until " + db_stopTime)
                 );
 
-                // mark.setTag(db_user_id);
                 mark.setTag(availability);
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(marker));
             } else {
-                mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this));
 
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                 mark = mMap.addMarker(markerOptions.position(marker).title("Parking Owner: " + db_name)
                         .snippet("Address: " + address +
                                 '\n' + "Parking Number: " + db_parkingNumber +
                                 "\n" + "Phone Number: " + db_phone +
-                                "\n" + "Available until " + db_stopTime +
-                                "\n" + "                 AVAILABLE")
+                                "\n" + "Available until " + db_stopTime)
                 );
 
                 mark.setTag(availability);
-
-                // mark.setTag(db_user_id);
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(marker));
             }
-
-
         }
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
+    }
 
-        //after adding a marker we will make the button un-click able
-    }//end add marker
-
-    private void openDialog(Marker marker, MarkerOptions markerOptions) {
+    private void openDialog(Marker marker, MarkerOptions markerOptions, String parkinspotID) {
         AlertDialog.Builder builder1 = new AlertDialog.Builder(MapsActivity.this);
-        builder1.setTitle("You are about to mark this spot as claimed");
-        builder1.setMessage("You sure?");
+        builder1.setTitle("You are about to mark this spot as claimed.");
+        builder1.setMessage("Please confirm.");
         builder1.setCancelable(true);
 
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-
         builder1.setPositiveButton(
                 "Yes",
                 new DialogInterface.OnClickListener() {
@@ -537,8 +436,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                         marker.setIcon(getMarkerIcon(getResources().getColor(R.color.red)));
                         Boolean claimed = true;
-                        claim_spot(db_parkingspotID);
-
+                        claim_spot(parkinspotID);
+                        //set_parking_available(parkinspotID); //set availability to 0
                     }
                 });
 
@@ -546,7 +445,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 "No",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        //Toast.makeText(MapsActivity.this, "Spot Claimed UNsuccessfully!", Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -557,10 +455,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void getData() {
         // creating a new variable for our request queue
         RequestQueue queue = Volley.newRequestQueue(MapsActivity.this);
-        // in this case the data we are getting is in the form
-        // of array so we are making a json array request.
-        // below is the line where we are making an json array
-        // request and then extracting data from each json object.
+        // in this case the data we are getting is in the form of an array so we are making a json array request.
+        // below is the line where we are making an json array request and then extracting data from each json object.
         String url = Constants.BaseUrl + "markers";
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
             @Override
@@ -573,9 +469,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         // we are getting each json object.
                         JSONObject responseObj = response.getJSONObject(i);
 
-                        // now we get our response from API in json object format.
-                        // in below line we are extracting a string with
-                        // its key value from our json object.
+                        // now we get our response from API in json object format. in below line we are extracting a string with its key value from our json object.
                         // similarly we are extracting all the strings from our json object.
                         db_user_id = responseObj.getString("id_user");
                         db_latitude = responseObj.getString("latitude");
@@ -589,7 +483,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         db_availability = responseObj.getString("id");
                         db_parkingspotID = responseObj.getString("parkingspotID");
                         db_claimed = responseObj.getString("claimed");
-
+                        //Here I could use a proper object, or at least this JSONObject type... But I used none of them, which is an assumed bad practice.
                         add_marker(db_user_id, db_availability, db_parkingspotID, db_latitude, db_longitude, db_address, db_parkingNumber, db_name, db_phone, db_startTime, db_stopTime, db_claimed);
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -608,51 +502,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String getCurrentDateTime() {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         return formatter.format(new Date(System.currentTimeMillis()));
-    }
-
-    public void delete_availability(Marker marker, MarkerOptions markerOptions) {
-        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        String token=preferences_token.getString("token", null);
-
-        Gson gson = new GsonBuilder()
-                .setLenient()
-                .create();
-        //build retrofit request
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Constants.BaseUrl)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        Call<JsonObject> call = retrofit.create(MyApi.class).deleteAvailability
-                (
-                        Constants.bearerToken,
-                        Objects.requireNonNull(marker.getTag()).toString()
-
-                );
-        call.enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Toast.makeText(MapsActivity.this, "Spot Claimed successfully!", Toast.LENGTH_SHORT).show();
-
-                    //markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
-
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(14));
-                    marker.remove();
-                    Calendar rightNow = Calendar.getInstance();
-                    int currentHourIn24Format = rightNow.get(Calendar.HOUR_OF_DAY); // return the hour in 24 hrs format (ranging from 0-23)
-                    Toast.makeText(MapsActivity.this, currentHourIn24Format, Toast.LENGTH_SHORT).show();
-                    // return true;
-
-
-                }
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                Log.e("RETROFIT", "onFailure: " + t.getLocalizedMessage());
-            }
-        });
     }
 
     public BitmapDescriptor getMarkerIcon(int color) {
@@ -689,13 +538,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }//end compare
 
 
-    private void first_function(MarkerOptions markerOptions, LatLng latLng) {
+    private void initialization(MarkerOptions markerOptions, LatLng latLng) {
 
         mCurrLocationMarker = mMap.addMarker(markerOptions.visible(false));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this));
-
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
@@ -712,66 +559,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (owner - user == 0)
                         ver = true;
 
-//                    if(ver == false)
-//                    {
-//                        openDialog(marker, markerOptions);
-//                    }
-
                     if (ver == false) {
                         if (availability.getClaimed().equals("0"))
-                            openDialog(marker, markerOptions);
+                            openDialog(marker, markerOptions, availability.getParkingspot_id());
                         else {
                             Toast.makeText(getApplicationContext(), "This parking is already claimed", Toast.LENGTH_LONG).show();
                         }
                     }
 
-
                     if (ver == true) {
                         Toast.makeText(getApplicationContext(), "You can't claim your own parking", Toast.LENGTH_LONG).show();
                     }
                 }
-
-
             }
         });
 
-    }
-
-
-    private void second_function(MarkerOptions markerOptions, LatLng latLng) {
-
-        mCurrLocationMarker = mMap.addMarker(markerOptions.visible(false));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this));
-        String text = (String) mCurrLocationMarker.getTag();
-        Log.d(TAG, "onLocationChanged: " + text);
-
-        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
-            public void onInfoWindowClick(Marker marker) {
-                Log.d(TAG, "InfoWindow was clicked!");
-                Log.d(TAG, "\n ID of the parking owner = " + marker.getTag() + "\n ID of the logged user= " + Constants.user_id);
-                Log.d(TAG, "onInfoWindowClick: " + ver);
-                ver = false;
+            public boolean onMarkerClick(Marker marker) {
+
+
                 if (marker.getTag() != null) {
-                    ver = false;
-                    int owner = Integer.parseInt((String) marker.getTag());
-                    int user = Integer.parseInt((String) Constants.user_id);
-                    if (owner - user == 0)
-                        ver = true;
+                    Availability availability = (Availability) marker.getTag();
+                    Log.e(TAG, "onMarkerClick: The userID : " + availability.getUser_id());
+                    Log.e(TAG, "onMarkerClick: The ownerID of the checked parking:" + Constants.user_id);
 
-                    if (ver == false) {
-                        openDialog(marker, markerOptions);
-                    }
-
-
-                    if (ver == true) {
-                        Toast.makeText(getApplicationContext(), "You can't claim your own parking", Toast.LENGTH_LONG).show();
+                    if (availability.getClaimed().toString().equals("1") || Constants.user_id.equals(availability.getUser_id())) {
+                        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this, 1));
+                    } else {
+                        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this, 0));
                     }
                 }
-
-
+                return false;
             }
         });
 
@@ -779,7 +598,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void claim_spot(String id) {
         SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        String token=preferences_token.getString("token", null);
+        String token = preferences_token.getString("token", null);
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
@@ -801,7 +620,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (response.isSuccessful() && response.body() != null) {
                     Log.e(TAG, "onResponse: ");
                     Toast.makeText(MapsActivity.this, "The ParkingSpot was claimed successfully!", Toast.LENGTH_SHORT).show();
+                    refresh_activity();
 
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ParkingSpot> call, Throwable t) {
+                Toast.makeText(MapsActivity.this, Constants.error_availability, Toast.LENGTH_SHORT).show();
+                Log.e("RETROFIT", "onFailure: " + t.getLocalizedMessage());
+            }
+        });
+    }
+
+    private void refresh_activity() {
+        finish();
+        overridePendingTransition(0, 0);
+        startActivity(getIntent());
+        overridePendingTransition(0, 0);
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        return false;
+    }
+
+    void set_parking_available(String parkingspot_id) {
+
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+        //build retrofit request
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Constants.BaseUrl)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+
+        Call<ParkingSpot> call = retrofit.create(MyApi.class).availableSpot(
+                Constants.bearerToken,
+                parkingspot_id,
+                0
+        );
+
+        call.enqueue(new Callback<ParkingSpot>() {
+            @Override
+            public void onResponse(@NotNull Call<ParkingSpot> call, @NotNull retrofit2.Response<ParkingSpot> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.println(Log.DEBUG, TAG, response.toString() + "available from 0 to 1 !");
                 }
             }
 

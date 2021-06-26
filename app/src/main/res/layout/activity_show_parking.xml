@@ -4,22 +4,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     tools:context=".activities.ShowParkingActivity">
+
+<!--    android:background="@drawable/logged_user_background"-->
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_parking_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="16dp"
-        android:layout_centerHorizontal="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
         android:src="@drawable/ic_add_plus1"
-        app:backgroundTint="#009900"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="16dp" />
+        app:backgroundTint="#009900" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
@@ -28,9 +30,6 @@
         android:padding="8dp"
         android:requiresFadingEdge="vertical"
         android:scrollbars="vertical" />
-
-
-
 
 
 </RelativeLayout>

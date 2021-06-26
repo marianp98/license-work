@@ -1,25 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/linear"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:hapticFeedbackEnabled="true"
     android:background="@drawable/infowindow_background"
-    android:enabled="true"
-    android:focusable="true"
-    android:longClickable="true"
-    android:orientation="horizontal"
+    android:backgroundTint="#808080"
     android:padding="15dp"
-    android:textIsSelectable="true">
+    android:enabled="true"
+    android:textIsSelectable="true"
+    android:focusable="true"
+    android:longClickable="true">
 
     <LinearLayout
         android:id="@+id/linear1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:enabled="true"
-        android:focusable="true"
-        android:longClickable="true"
         android:orientation="vertical"
-        android:textIsSelectable="true">
+        android:enabled="true"
+        android:textIsSelectable="true"
+        android:focusable="true"
+        android:longClickable="true">
 
         <TextView
             android:id="@+id/title"
@@ -27,14 +30,14 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:ellipsize="end"
-            android:enabled="true"
-            android:focusable="true"
-            android:longClickable="true"
             android:maxLines="1"
             android:textColor="#000"
-            android:textIsSelectable="true"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:enabled="true"
+            android:textIsSelectable="true"
+            android:focusable="true"
+            android:longClickable="true"/>
 
         <TextView
             android:id="@+id/user_id_claim"
@@ -49,25 +52,25 @@
             android:id="@+id/snippet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="left"
             android:ellipsize="end"
-            android:enabled="true"
-            android:focusable="true"
-            android:longClickable="true"
             android:maxLines="10"
             android:textColor="#000"
             android:textIsSelectable="true"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:enabled="true"
+            android:focusable="true"
+            android:longClickable="true" />
 
         <Button
-            android:id="@+id/button_claim"
+            android:id="@+id/button_claimed"
+            android:layout_gravity="right"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_gravity="right"
-            android:background="@drawable/signup_button_shape"
-            android:enabled="true"
+            android:enabled="false"
+            android:background="@drawable/login_button_shape"
             android:text="Claim" />
-
     </LinearLayout>
 
 </RelativeLayout>

@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -19,6 +21,7 @@ import com.example.parkingappv2.Constants;
 import com.example.parkingappv2.MyApi;
 import com.example.parkingappv2.R;
 import com.example.parkingappv2.models.Availability;
+import com.example.parkingappv2.models.ParkingSpot;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -41,13 +44,7 @@ public class SetAvailabilityActivity extends AppCompatActivity {
     int mHour;
     int mMinute;
     private TextView mDisplayTime;
-    private TimePickerDialog.OnTimeSetListener mTimeSetListener;
     private TextView mDisplayTime_end;
-    private TimePickerDialog.OnTimeSetListener mTimeSetListener_end;
-    private TextView mDisplayDate;
-    private DatePickerDialog.OnDateSetListener mDateSetListener;
-    private TextView mDisplayDate_end;
-    private DatePickerDialog.OnDateSetListener mDateSetListener_end;
     private Button save_button;
 
     @Override
@@ -59,7 +56,6 @@ public class SetAvailabilityActivity extends AppCompatActivity {
         save_button = findViewById(R.id.available_marking_button);
         mDisplayTime = (TextView) findViewById(R.id.start_date);
         mDisplayTime_end = (TextView) findViewById(R.id.end_date);
-        save_button.setEnabled(true);
 
         //listeners
         mDisplayTime.setOnClickListener(v -> datePicker());
@@ -69,11 +65,12 @@ public class SetAvailabilityActivity extends AppCompatActivity {
             SaveAvailability();
         });
 
+        mDisplayTime.addTextChangedListener(availabilityIntervalTextWatcher);
+        mDisplayTime_end.addTextChangedListener(availabilityIntervalTextWatcher);
+
     }
 
     private void SaveAvailability() {
-        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        String token=preferences_token.getString("token", null);
 
         TextView textview_startTime = (TextView) findViewById(R.id.start_date);
         String startTime = textview_startTime.getText().toString();
@@ -83,6 +80,7 @@ public class SetAvailabilityActivity extends AppCompatActivity {
 
         Intent intent_made_for_id = getIntent();
         String id = intent_made_for_id.getStringExtra("id");
+        update_parking_date(startTime, endTime);
 
         Log.d(TAG, startTime + " SI " + endTime);
         Gson gson = new GsonBuilder()
@@ -109,9 +107,8 @@ public class SetAvailabilityActivity extends AppCompatActivity {
                     Log.println(Log.DEBUG, TAG, response.toString() + "TEST");
 
                     Toast.makeText(SetAvailabilityActivity.this, Constants.success_availability, Toast.LENGTH_SHORT).show();
-
-
-
+                    set_parking_available();
+                    update_parking_date(startTime, endTime);
                     textview_startTime.setText("");
                     textview_endTime.setText("");
 
@@ -123,6 +120,10 @@ public class SetAvailabilityActivity extends AppCompatActivity {
                     }, 1000);
 
                 }//res
+                else {
+                    Toast.makeText(SetAvailabilityActivity.this, Constants.error_availability, Toast.LENGTH_SHORT).show();
+
+                }
             }//res
 
             @Override
@@ -131,7 +132,7 @@ public class SetAvailabilityActivity extends AppCompatActivity {
                 Log.e("RETROFIT", "onFailure: " + t.getLocalizedMessage());
             }
         });
-    }//end fun
+    }
 
     private void datePicker() {
 
@@ -180,7 +181,6 @@ public class SetAvailabilityActivity extends AppCompatActivity {
     }
 
     private void datePicker_end() {
-
         // Get Current Date
         final Calendar c = Calendar.getInstance();
         mYear = c.get(Calendar.YEAR);
@@ -239,5 +239,101 @@ public class SetAvailabilityActivity extends AppCompatActivity {
         return str;
     }
 
+    private TextWatcher availabilityIntervalTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
 
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            String startDate = mDisplayTime.getText().toString().trim();
+            String stopDate = mDisplayTime_end.getText().toString().trim();
+
+            if (!startDate.isEmpty() && !stopDate.isEmpty()) {
+                save_button.setEnabled(true);
+                save_button.setBackgroundResource(R.drawable.signup_button_shape);
+
+            } else {
+                save_button.setEnabled(false);
+                save_button.setBackgroundResource(R.drawable.login_button_shape);
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+        }
+    };
+
+
+    void set_parking_available() {
+        String parkingspot_id = getIntent().getStringExtra("id");
+
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+        //build retrofit request
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Constants.BaseUrl)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+
+        //MyApi api = retrofit.create(MyApi.class);
+        Call<ParkingSpot> call = retrofit.create(MyApi.class).availableSpot(
+                Constants.bearerToken,
+                parkingspot_id,
+                1
+        );
+
+        call.enqueue(new Callback<ParkingSpot>() {
+            @Override
+            public void onResponse(@NotNull Call<ParkingSpot> call, @NotNull retrofit2.Response<ParkingSpot> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.println(Log.DEBUG, TAG, response.toString() + "available from 0 to 1 !");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ParkingSpot> call, Throwable t) {
+                Toast.makeText(SetAvailabilityActivity.this, Constants.error_availability, Toast.LENGTH_SHORT).show();
+                Log.e("RETROFIT", "onFailure: " + t.getLocalizedMessage());
+            }
+        });
+    }
+
+
+    void update_parking_date(String startTime, String endTime) {
+        String parkingspot_id = getIntent().getStringExtra("id");
+
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+        //build retrofit request
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Constants.BaseUrl)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+
+        //MyApi api = retrofit.create(MyApi.class);
+        Call<ParkingSpot> call = retrofit.create(MyApi.class).updateParkingDate(
+                Constants.bearerToken,
+                parkingspot_id,
+                startTime,
+                endTime
+        );
+
+        call.enqueue(new Callback<ParkingSpot>() {
+            @Override
+            public void onResponse(@NotNull Call<ParkingSpot> call, @NotNull retrofit2.Response<ParkingSpot> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.println(Log.DEBUG, TAG, response.toString() + "Availability Interval updated");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ParkingSpot> call, Throwable t) {
+                Toast.makeText(SetAvailabilityActivity.this, Constants.error_availability, Toast.LENGTH_SHORT).show();
+                Log.e("RETROFIT", "onFailure: " + t.getLocalizedMessage());
+            }
+        });
+    }
 }

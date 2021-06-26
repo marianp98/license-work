@@ -1,11 +1,7 @@
 package com.example.parkingappv2.activities;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,11 +9,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.parkingappv2.Constants;
-import com.example.parkingappv2.updates.EmailUpdate;
 import com.example.parkingappv2.MyApi;
-import com.example.parkingappv2.updates.PhoneUpdate;
 import com.example.parkingappv2.R;
+import com.example.parkingappv2.updates.EmailUpdate;
+import com.example.parkingappv2.updates.PhoneUpdate;
 import com.google.gson.JsonObject;
 
 import retrofit2.Call;
@@ -43,64 +42,58 @@ public class ShowUserActivity extends AppCompatActivity {
 
         show_user();
 
-        delete_button=findViewById(R.id.delete_user_button);
+        delete_button = findViewById(R.id.delete_user_button);
         delete_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 alert_popup();
-//                delete_user();
             }
         });
-    phone_button=findViewById(R.id.change_phone_button);
-    phone_button.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Intent update_phone=new Intent(getApplicationContext(), PhoneUpdate.class);
-            finish();
-            startActivity(update_phone);
-        }
-    });
+        phone_button = findViewById(R.id.change_phone_button);
+        phone_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent update_phone = new Intent(getApplicationContext(), PhoneUpdate.class);
+                finish();
+                startActivity(update_phone);
+            }
+        });
 
-        email_button=findViewById(R.id.change_email_button);
+        email_button = findViewById(R.id.change_email_button);
         email_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent update_email=new Intent(getApplicationContext(), EmailUpdate.class);
+                Intent update_email = new Intent(getApplicationContext(), EmailUpdate.class);
                 finish();
                 startActivity(update_email);
             }
         });
-
     }
 
     private void alert_popup() {
 
-            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Are you sure you want to delete this account?")
-                    .setCancelable(true)
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        public void onClick(final DialogInterface dialog, final int id) {
-                            //startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                            Intent i = new Intent(getApplicationContext(), LoginActivity.class);
-                            delete_user();
-                            Toast.makeText(getApplicationContext(), "Account successfully deleted", Toast.LENGTH_SHORT).show();
-                            finishAffinity();
-                            startActivity(i);
-                        }
-                    })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        public void onClick(final DialogInterface dialog, final int id) {
-                            dialog.cancel();
-                        }
-                    });
-            final AlertDialog alert = builder.create();
-            alert.show();
-
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure you want to delete this account?")
+                .setCancelable(true)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+                        delete_user();
+                        Toast.makeText(getApplicationContext(), "Account successfully deleted", Toast.LENGTH_SHORT).show();
+                        finishAffinity();
+                        startActivity(i);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
     }
 
     private void delete_user() {
-        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        String token=preferences_token.getString("token", null);
 
         //build retrofit request
         Retrofit retrofit = new Retrofit.Builder()
@@ -115,10 +108,10 @@ public class ShowUserActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> response) {
                 if (response.isSuccessful() && response.body() != null) {
-//                    Toast.makeText(ShowUserActivity.this, "Account successfully deleted!!", Toast.LENGTH_SHORT).show();
-
+                    Toast.makeText(ShowUserActivity.this, "Account successfully deleted!", Toast.LENGTH_SHORT).show();
                 }
             }
+
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
                 Log.e("RETROFIT", "onFailure: " + t.getLocalizedMessage());
@@ -129,9 +122,6 @@ public class ShowUserActivity extends AppCompatActivity {
 
 
     private void show_user() {
-        SharedPreferences preferences_token = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        String token=preferences_token.getString("token", null);
-
         name_tv = (TextView) findViewById(R.id.user_name);
         username_tv = (TextView) findViewById(R.id.user_username);
         email_tv = (TextView) findViewById(R.id.user_email);
@@ -150,15 +140,15 @@ public class ShowUserActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<JsonObject> call, retrofit2.Response<JsonObject> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    //Toast.makeText(ShowUserActivity.this, response.body().toString(), Toast.LENGTH_SHORT).show();
                     JsonObject user_info = response.body();
                     name_tv.setText(user_info.get("name").getAsString());
                     username_tv.setText(user_info.get("username").getAsString());
                     email_tv.setText(user_info.get("email").getAsString());
                     phone_tv.setText(user_info.get("phone").getAsString());
-                        Log.d(TAG, user_info.toString());
+                    Log.d(TAG, user_info.toString());
                 }
             }
+
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
                 Log.e("RETROFIT", "onFailure: " + t.getLocalizedMessage());

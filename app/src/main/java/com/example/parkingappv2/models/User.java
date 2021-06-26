@@ -4,42 +4,19 @@ import com.google.gson.annotations.SerializedName;
 
 public class User {
 
-    @SerializedName("name")
-    private String name;
+    //  @SerializedName("name") // used to prevent the violation of naming convention
 
-    @SerializedName("email")
-    private String email;
-
-//    @SerializedName("username")
-//    private String username;
-//
-//    @SerializedName("phone")
-//    private String phone;
-//
-    @SerializedName("access_token")
-    private String access_token;
-
-    @SerializedName("password")
-    private String password;
-
-    @SerializedName("id")
-    private String id;
+    private String name, email, username, phone, access_token, password, id;
 
 
     public User(String id, String email, String access_token, String password, String name) {
-        this.id=id;
+        this.id = id;
         this.email = email;
         this.access_token = access_token;
         this.password = password;
-        this.name= name;
+        this.name = name;
 
     }
-
-//    public User(String email, String access_token, String password) {
-//        this.email = email;
-//        this.access_token = access_token;
-//        this.password = password;
-//    }
 
     public String getEmail() {
         return email;
@@ -49,15 +26,17 @@ public class User {
         this.email = email;
     }
 
-    public void setPassword(String password) { this.password = password; }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-    public String getPassword() { return password; }
-    public String getToken() { return access_token; }
-//
-//    public void setToken(String token) { this.token = token; }
-//
-//    public String getUsername() {
-//        return username;
+    public String getPassword() {
+        return password;
+    }
+
+    public String getToken() {
+        return access_token;
+    }
 
     public String getAccess_token() {
         return access_token;
@@ -74,19 +53,6 @@ public class User {
     public void setId(String id) {
         this.id = id;
     }
-//    }
-//
-//    public void setUsername(String username) {
-//        this.username = username;
-//    }
-//
-//    public String getPhone() {
-//        return phone;
-//    }
-//
-//    public void setPhone(String phone) {
-//        this.phone = phone;
-//    }
 
     public String getName() {
         return name;

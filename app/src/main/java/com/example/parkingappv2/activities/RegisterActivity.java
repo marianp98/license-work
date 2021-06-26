@@ -1,7 +1,5 @@
 package com.example.parkingappv2.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -34,7 +34,6 @@ public class RegisterActivity extends AppCompatActivity {
     private TextView register_phone_number;
     private Button register_button;
 
-    //int success=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,11 +46,11 @@ public class RegisterActivity extends AppCompatActivity {
         register_phone_number=findViewById(R.id.registerpage_phone_number);
         register_button=findViewById(R.id.registerpage_registerbutton);
 
-        register_name.addTextChangedListener(loginTextWatcher);
-        register_email.addTextChangedListener(loginTextWatcher);
-        register_password.addTextChangedListener(loginTextWatcher);
-        register_username.addTextChangedListener(loginTextWatcher);
-        register_phone_number.addTextChangedListener(loginTextWatcher);
+        register_name.addTextChangedListener(registerTextWatcher);
+        register_email.addTextChangedListener(registerTextWatcher);
+        register_password.addTextChangedListener(registerTextWatcher);
+        register_username.addTextChangedListener(registerTextWatcher);
+        register_phone_number.addTextChangedListener(registerTextWatcher);
 
         register_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,7 +91,7 @@ public class RegisterActivity extends AppCompatActivity {
                         //success=1;
                         Log.e("Rest Response", response.toString());
                         // TODO : initiate successful registered in experience
-                        Toast.makeText(getApplicationContext(), "You have successfully registered.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), Constants.success_register, Toast.LENGTH_LONG).show();
                         Intent login_after_register_intent = new Intent(context, LoginActivity.class);
                         startActivity(login_after_register_intent);
                     }
@@ -101,25 +100,11 @@ public class RegisterActivity extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e("Rest Response", error.toString());
-                        Toast.makeText(getApplicationContext(), "Something is wrong, try again", Toast.LENGTH_LONG).show();
-
-
+                        Toast.makeText(getApplicationContext(), Constants.fail_register, Toast.LENGTH_LONG).show();
                     }
                 }
 
         );
-//        if(success == 1)
-//        {
-//            // TODO : initiate successful registered in experience
-//            Toast.makeText(getApplicationContext(), "You have successfully registered.", Toast.LENGTH_LONG).show();
-//            Intent login_after_register_intent = new Intent(context, MainActivity.class);
-//            startActivity(login_after_register_intent);
-//        }
-//        else
-//        {
-//            Toast.makeText(getApplicationContext(), "Something is wrong, try again", Toast.LENGTH_LONG).show();
-//
-//        }
 
         objectRequest.setRetryPolicy(new DefaultRetryPolicy(
                 60000,
@@ -128,7 +113,7 @@ public class RegisterActivity extends AppCompatActivity {
         requestQueue.add(objectRequest);
     }
 
-    private TextWatcher loginTextWatcher = new TextWatcher() {
+    private TextWatcher registerTextWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
         }
