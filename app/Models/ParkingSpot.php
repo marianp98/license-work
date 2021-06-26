@@ -18,6 +18,7 @@ class ParkingSpot extends Model
         'address',
         'latitude',
         'longitude',
+        'available',
         'claimed'
     ];
 

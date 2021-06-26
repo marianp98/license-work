@@ -19,9 +19,12 @@ class CreateParkingSpotsTable extends Migration
             $table->integer('parkingNumber');
             $table->double('latitude');
             $table->double('longitude');
+            $table->boolean('available');
             $table->boolean('claimed');
+            $table->dateTime('start_date');
+            $table->dateTime('stop_date');
             $table->timestamps();
-             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
         });
     }
     /**

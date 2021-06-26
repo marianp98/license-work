@@ -16,12 +16,11 @@ class MarkerController extends Controller
      */
     public function index()
     {
-
         $con = mysqli_connect("localhost", "root", "", "parkingdb");
 
         $sql =
             "SELECT users.id as id_user, users.name, users.phone,
-             parking_spots.id as parkingspotID, parking_spots.latitude,parking_spots.longitude,parking_spots.address,parking_spots.parkingNumber,parking_spots.claimed as claimed,
+             parking_spots.id as parkingspotID, parking_spots.latitude,parking_spots.longitude,parking_spots.address,parking_spots.parkingNumber,parking_spots.claimed as claimed,parking_spots.address,
              availabilities.start_date, availabilities.stop_date, availabilities.id
              FROM parking_spots
              JOIN availabilities ON parking_spots.id=availabilities.parkingspot_id
@@ -30,18 +29,14 @@ class MarkerController extends Controller
              BETWEEN availabilities.start_date
              AND availabilities.stop_date";
         $result = mysqli_query($con, $sql);
-        // $row = mysqli_fetch_assoc($result);
-        // dd($row);
+
         $markers = array();
         while ($row = mysqli_fetch_assoc($result)) {
             $markers[] = $row;
         }
-
-
         header('Content-Type:Application/json');
 
         echo json_encode($markers);
-
 
     }
 
@@ -120,7 +115,7 @@ class MarkerController extends Controller
     {
         $request->validate([
             'id' => 'required|string',
-            'claimed' => 'required|boolean']);
+            'claimed' => 'required|int']);
 
         $id = $request->id;
 
@@ -131,4 +126,21 @@ class MarkerController extends Controller
         $result->save();
         return $result;
     }
+
+    public function available_update(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|string',
+            'available' => 'required|int']);
+
+        $id = $request->id;
+
+        $result = ParkingSpot::find($id);
+
+
+        $result->available = $request->available;
+        $result->save();
+        return $result;
+    }
+
 }
